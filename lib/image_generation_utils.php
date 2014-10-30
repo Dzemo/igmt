@@ -185,19 +185,6 @@
 	}
 
 	/**
-	 * Print the specified deep of the tree
-	 * @param  array $tree 
-	 * @param  int $deep 
-	 */
-	function printTreeLevel($tree, $deep){
-		echo "Deep ".$deep.":";
-		foreach ($tree[$deep] as $tree_level) {
-			echo " ".$tree_level->getName();
-		}
-		echo "<br>";		
-	}
-
-	/**
 	 * Compute de height of the image from the size of the font and the elements in the tree
 	 * @param  array $tree         
 	 * @param  int $font 
@@ -243,6 +230,41 @@
 		}
 
 		return $width;
+	}
+
+	/**
+	 * Convert a css color code (as "#000000" or "#000") to an array containing rgb values 
+	 * @param  string $hex 
+	 * @return array
+	 */
+	function hex2rgb($hex) {
+		$hex = str_replace("#", "", $hex);
+
+		if(strlen($hex) == 3) {
+			$r = hexdec(substr($hex,0,1).substr($hex,0,1));
+			$g = hexdec(substr($hex,1,1).substr($hex,1,1));
+			$b = hexdec(substr($hex,2,1).substr($hex,2,1));
+		} else {
+			$r = hexdec(substr($hex,0,2));
+			$g = hexdec(substr($hex,2,2));
+			$b = hexdec(substr($hex,4,2));
+		}
+		$rgb = array($r, $g, $b);
+		//return implode(",", $rgb); // returns the rgb values separated by commas
+		return $rgb; // returns an array with the rgb values
+	}
+
+	/**
+	 * Print the specified deep of the tree
+	 * @param  array $tree 
+	 * @param  int $deep 
+	 */
+	function printTreeLevel($tree, $deep){
+		echo "Deep ".$deep.":";
+		foreach ($tree[$deep] as $tree_level) {
+			echo " ".$tree_level->getName();
+		}
+		echo "<br>";		
 	}
 	
 	/**

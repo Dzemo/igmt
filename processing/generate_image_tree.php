@@ -18,12 +18,21 @@
 	$heigth = getImageHeight($tree, $font, $margin_y, $space_y);
 	$image = imagecreate($width, $heigth);
 
-	//Create colors
+	//White background
 	$blanc = imagecolorallocate($image, 255, 255, 255);
-	$noir = imagecolorallocate($image, 0, 0, 0);
+
+	//Gather category color
+	$categories = CategoryDao::getAll();
+	$colorsForCategory = array();
+	foreach ($categories as $category) {
+		$hexColor = hex2rgb($category->getColor());
+		$colorsForCategory[$category->getName()] = imagecolorallocate($image, $hexColor[0], $hexColor[1], $hexColor[2]);
+	}
+	//default black color
+	$colorsForCategory['default'] = imagecolorallocate($image, 0, 0, 0);
 
 	//Printing the Elements
-	$treePos = drawTreeElements($image, $tree, $font, $margin_x, $margin_y, $space_x, $space_y, array('default' => $noir));
+	$treePos = drawTreeElements($image, $tree, $font, $margin_x, $margin_y, $space_x, $space_y, $colorsForCategory);
 
 	//Drawing arrows
 	foreach ($treePos as $name => $treeElem) {
