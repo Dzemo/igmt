@@ -5,13 +5,17 @@
 	 *
 	 * Test Embarcation et EmbarcationDao
 	 */
-
-	require_once("../lib/classloader.php");
+	require_once("lib/classloader.php");
 
 	/* Test getAll*/
 	echo "<br/>ElementDao::getAll()<br/>";
 	$array = ElementDao::getAll();
 	foreach ($array as $elem) {
-		echo "$elem<br/>";
+		echo $elem."<br>";
 	}
+
+	/* Test getByID*/
+	echo "<br/>ElementDao::getAll()<br/>";
+
+
 ?>

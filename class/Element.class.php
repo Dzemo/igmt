@@ -4,8 +4,6 @@
  * @author Raphaël BIDEAU
  * @version 1.0
  */
-
-
 /**
  * Class that represents an Element of the game. 
  */
@@ -14,14 +12,12 @@ class Element{
 	////////////////
 	// ATTRIBUTS //
 	////////////////
-
 	/**
 	 * Name of this element.
 	 * Max length 40. Not null.
 	 * @var string
 	 */
 	private $name;
-
 	/**
 	 * Name of the category of this element. For example: building, resource,...
 	 * Must be use for naming the css classe for this element.
@@ -29,48 +25,40 @@ class Element{
 	 * @var string
 	 */
 	private $category;
-
 	/**
 	 * Description of this element. Texte.
 	 * Could be null.
 	 * @var Category
 	 */
 	private $description;
-
 	/**
 	 * Liste of Tag for this element.
 	 * @var array Array of string
 	 */
 	private $tags;
-
 	/**
 	 * Liste of needd elements by this element.
 	 * @var array Array of Need
 	 */
 	private $need;
-
 	/**
 	 * Liste of allowed elements by this element.
 	 * @var array Array of Allow
 	 */
 	private $allow;
-
 	/**
 	 * Element extended by this element, may be null
 	 * @var Element
 	 */
 	private $extends;
-
 	/**
 	 * List of Elements that extends this element
 	 * @var array
 	 */
 	private $extendedBy;
-
 	//////////////////
 	// CONSTRUCTOR //
 	//////////////////
-
 	/**
 	 * Initialise this Element description as emtpy string, tag, allow, need and extendedBy as empty array and extends as null
 	 *
@@ -85,7 +73,6 @@ class Element{
 			throw new InvalidArgumentException ("name length must be less thant 40");
 		else if($category == null)
 			throw new InvalidArgumentException ("category can't be empty");
-
 		$this->name = $name;
 		$this->category = $category;
 		$this->description = '';
@@ -95,11 +82,9 @@ class Element{
 		$this->extends = null;
 		$this->extendedBy = array();
 	}
-
 	////////////////////////
 	// GETTER and SETTER //
 	////////////////////////
-
 	/**
 	 * @return string
 	 */
@@ -115,10 +100,8 @@ class Element{
 			throw new InvalidArgumentException ("name must be a none empty string");
 		else if(strlen($name) > 40)
 			throw new InvalidArgumentException ("name length must be less thant 40");
-
 		$this->name = $name ;
 	}
-
 	/**
 	 * @return string
 	 */
@@ -134,10 +117,8 @@ class Element{
 			throw new InvalidArgumentException ("category must be a none empty string");
 		else if(strlen($category) > 20)
 			throw new InvalidArgumentException ("category length must be less thant 20");
-
 		$this->category = $category ;
 	}
-
 	/**
 	 * @return string
 	 */
@@ -151,7 +132,6 @@ class Element{
 		if($description != null && is_string($description))
 			$this->description = $description ;
 	}
-
 	/**
 	 * @return array
 	 */
@@ -193,7 +173,6 @@ class Element{
 		if(is_array($allow))
 			$this->allow = $allow ;
 	}
-
 	/**
 	 * @return Element
 	 */
@@ -206,7 +185,6 @@ class Element{
 	public function setExtends(Element $extends){
 		$this->extends = $extends ;
 	}
-
 	/**
 	 * @return array
 	 */
@@ -220,7 +198,6 @@ class Element{
 		if(is_array($extendedBy))
 			$this->extendedBy = $extendedBy ;
 	}
-
 	////////////////////
 	// OTHER METHODS //
 	////////////////////
@@ -232,7 +209,6 @@ class Element{
 	public function trimedName(){
 		return preg_replace('/( *)/', '', $this->name);
 	}
-
 	/**
 	 * Determine wether this element has a description
 	 * @return boolean
@@ -240,7 +216,6 @@ class Element{
 	public function hasDescription(){
 		return strlen($this->description) > 0;
 	}
-
 	/**
 	 * Add a tag to the tags. Avoid null and empty string
 	 * @param string $tag 
@@ -249,7 +224,6 @@ class Element{
 		if($tag !== null && strlen($tag) > 0)
 			$this->tags[] = $tag;
 	}
-
 	/**
 	 * Determine wether this element has some tags
 	 * @return boolean
@@ -257,7 +231,6 @@ class Element{
 	public function hasTags(){
 		return count($this->tags) > 0;
 	}
-
 	/**
 	 * Determine wether this Element extends another Element
 	 * @return boolean true if this element extends another Element, false otherwise
@@ -265,7 +238,6 @@ class Element{
 	public function isExtending(){
 		return $this->extends != null;
 	}
-
 	/**
 	 * Add an extension element to this element
 	 * The extension must be a different element and not null
@@ -275,10 +247,8 @@ class Element{
 	public function addExtension(Element $extenstion){
 		if($extension == null || $extension->getName() == $this->name)
 			throw new InvalidArgumentException ("The extention element canno't be null or this element");
-
 		$this->extendedBy[] = $extension;
 	}
-
 	/**
 	 * Determine wether this element has some extension
 	 * @return boolean
@@ -286,7 +256,6 @@ class Element{
 	public function hasExtension(){
 		return count($this->extendedBy) > 0;
 	}
-
 	/**
 	 * Add a allow link to this element
 	 * @param Allow $allow 
@@ -297,10 +266,8 @@ class Element{
 			throw new InvalidArgumentException ("allow canno't be null");
 		else if($allow->getTarget()->getName() == $this->name)
 			throw new InvalidArgumentException ("the allow target canno't be this element");
-
 		$this->allow[] = $allow;
 	}
-
 	/**
 	 * Determine wether this element allow some other Elements
 	 * @return boolean
@@ -308,7 +275,6 @@ class Element{
 	public function hasAllowing(){
 		return count($this->allow) > 0;
 	}
-
 	/**
 	 * Add a need link to this element
 	 * @param Need $need 
@@ -319,10 +285,8 @@ class Element{
 			throw new InvalidArgumentException ("need canno't be null");
 		else if($need->getTarget()->getName() == $this->name)
 			throw new InvalidArgumentException ("the need target canno't be this element");
-
 		$this->need[] = $need;
 	}
-
 	/**
 	 * Determine wether this element need some other Elements
 	 * @return boolean
@@ -330,18 +294,17 @@ class Element{
 	public function hasNeed(){
 		return count($this->need) > 0;
 	}
-
 	/**
 	 * String representing this element
 	 * Example: 
 	 * @return string 
 	 */
 	public function __toString(){
-		$string = "Element: Name: ".$this->name." Category: ".$this->category;
-
+		$string = "Element: <br>".
+						"&emsp;Name: ".$this->name."<br>".
+						"&emsp;Category: ".$this->category."<br>";
 		if($this->hasDescription())
-			$string .= " Description: ".$this->description;
-
+			$string .= " &emsp;Description: ".$this->description."<br>";
 		if($this->hasTags()){
 			$stringTag = "";
 			foreach ($this->tags as $tag) {
@@ -349,9 +312,8 @@ class Element{
 					$stringTag .= ", ";
 				$stringTag .= $tag;
 			}
-			$string .= " Tags: [".$stringTag."]";
+			$string .= " &emsp;Tags: [".$stringTag."]<br>";
 		}
-
 		if($this->hasNeed()){
 			$stringNeed = "";
 			foreach ($this->need as $need) {
@@ -359,9 +321,8 @@ class Element{
 					$stringNeed .= ", ";
 				$stringNeed .= $need->getTarget()->getName();
 			}
-			$string .= " Need: [".$stringNeed."]";
+			$string .= " &emsp;Need: [".$stringNeed."]<br>";
 		}
-
 		if($this->hasAllowing()){
 			$stringAllow = "";
 			foreach ($this->allow as $allowing) {
@@ -369,12 +330,10 @@ class Element{
 					$stringAllow .= ", ";
 				$stringAllow .= $allowing->getTarget()->getName();
 			}
-			$string .= " Allow: [".$stringAllow."]";
+			$string .= " &emsp;Allow: [".$stringAllow."]<br>";
 		}
-
 		if($this->isExtending())
-			$string .= " Extending: ".$this->extends->getName();
-
+			$string .= " &emsp;Extending: ".$this->extends->getName()."<br>";
 		if($this->hasExtension()){
 			$stringExtension = "";
 			foreach ($this->extendedBy as $extension) {
@@ -382,9 +341,8 @@ class Element{
 					$stringExtension .= ", ";
 				$stringExtension .= $extension->getName();
 			}
-			$string .= "Extension: [".$stringExtension."]";
+			$string .= "&emsp;Extension: [".$stringExtension."]<br>";
 		}
-
 		return $string;
 	}
 }
