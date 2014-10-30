@@ -17,17 +17,17 @@ INSERT INTO igmt_element (name, category, description, tag) VALUES ('Population 
 DROP TABLE IF EXISTS igmt_link;
 CREATE TABLE igmt_link (
 	id MEDIUMINT NOT NULL AUTO_INCREMENT,
-	name_from MEDIUMINT NOT NULL,
-	name_to MEDIUMINT NOT NULL,
+	need varchar(40) NOT NULL,
+	allow varchar(40) NOT NULL,
 	type varchar(20) NOT NULL,	/* REQUIRE or EXTENDS */
 	conditions text,
 	CONSTRAINT pk_igmt_link PRIMARY KEY (id),
-	CONSTRAINT fk_igmt_link_from FOREIGN KEY (name_from) REFERENCES igmt_element(name),
-	CONSTRAINT fk_igmt_link_to FOREIGN KEY (name_to) REFERENCES igmt_element(name)
+	CONSTRAINT fk_igmt_link_from FOREIGN KEY (need) REFERENCES igmt_element(name),
+	CONSTRAINT fk_igmt_link_to FOREIGN KEY (allow) REFERENCES igmt_element(name)
 );
 
-INSERT INTO igmt_link (name_from, name_to, type, conditions) VALUES ('Wood', 'Hut', 'REQUIRE','Wood > 0');
-INSERT INTO igmt_link (name_from, name_to, type, conditions) VALUES ('Hut', 'Population Increase 10', 'REQUIRE','Hut built');
+INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Wood', 'Hut', 'REQUIRE','Wood > 0');
+INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Hut', 'Population Increase 10', 'REQUIRE','Hut built');
 
 
 DROP TABLE IF EXISTS igmt_category;
