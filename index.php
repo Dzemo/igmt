@@ -20,7 +20,6 @@
 		<!-- CSS GENERAL -->
 		<link href="css/styles.css" rel="stylesheet" type="text/css" media="all" />
 		<!-- JS GENERAL -->		
-		<script type="text/javascript" language="javascript" src="js/jquery.bpopup.min.js"></script>
 	</head>
 	<body>
 	<div id="wrapper">

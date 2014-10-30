@@ -65,14 +65,7 @@
 
 		//For each level of the tree
 		foreach($tree as $deep => $tree_level){
-
-			//Computing real x spacing because $space_x is only the minimum (when there is less element on a level)
-			$available_width = imagesx($image) - 2*$margin_x;
-			foreach ($tree_level as $index => $element){
-				$available_width -= strlen($element->getName()) * imagefontwidth($font);
-			}
-			$true_space_x = $available_width / count($tree_level);
-			$true_offset_x = $margin_x-1 + $true_space_x/2;
+			$offset_x = $margin_x-1;
 
 			//For each elements on this level
 			foreach ($tree_level as $index => $element) {
@@ -80,7 +73,7 @@
 				$width = strlen($element->getName()) * imagefontwidth($font);
 
 				$treePrintedElements[$element->getName()] = array(
-						'x' => $true_offset_x,
+						'x' => $offset_x,
 						'y' => $offset_y,
 						'element' => $element,
 						'height' => $height,
@@ -88,11 +81,11 @@
 						'color' => getColorForCategory($element->getCategory(), $colors)
 					);
 				
-				echo "Writing ".$element->getName().": x=".$treePrintedElements[$element->getName()]['x']." width=".$treePrintedElements[$element->getName()]['width']."<br>";
+				//echo "$name: x=".$treeElem['x']." y=".$treeElem['y']."<br>";
 				//print the string
 				imagestring($image, $font, $treePrintedElements[$element->getName()]['x'], $treePrintedElements[$element->getName()]['y'], $element->getName(), $treePrintedElements[$element->getName()]['color']);
 
-				$true_offset_x += $true_space_x + $width;
+				$offset_x += $space_x + $width;
 				$offset_y += $space_y + $height;
 			}
 		}
@@ -124,7 +117,8 @@
 		while($elements_left_in_array > 0){
 			$tree[$deep] = array();
 
-			foreach ($elements as $index => $element) {
+			for($index = 0; $index < count($elements); $index++) {
+				$element = $elements[$index];
 
 				if($element != null && isNeedMatch($element, $tree)){
 					$tree[$deep][] = $element;
@@ -146,13 +140,13 @@
 
 	/**
 	 * Find the corresponding colors in the array $colors, indexed by category name
-	 * @param  Category $category
+	 * @param  string $category
 	 * @param  array $colors  
 	 * @return ressource          
 	 */
-	function getColorForCategory(Category $category, $colors){
-		if(array_key_exists($category->getName(), $colors))
-			return $colors[$category->getName()];
+	function getColorForCategory($category, $colors){
+		if(array_key_exists($category, $colors))
+			return $colors[$category];
 		else if(array_key_exists('default', $colors))
 			return $colors['default'];
 		else
@@ -214,19 +208,12 @@
 
 		//Search for the deep with the most elements
 		$max_elements = 0;
-		$max_size = 0;
+		$max_deep = 0;
 		foreach ($tree as $deep => $tree_level){
-
-			$current_size = 0;
-			foreach($tree_level as $tree_elem){
-				$current_size += strlen($tree_elem->getName());
-			}
-
-			if($current_size > $max_size){
-				$max_size = $current_size;
+			if(count($tree_level) > $max_elements){
+				$max_elements = count($tree_level);
 				$max_deep = $deep;
 			}
-
 		}
 
 		//Compute the width
