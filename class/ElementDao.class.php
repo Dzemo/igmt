@@ -45,7 +45,26 @@ class ElementDao extends Dao{
 					$element->setDescription('');
 					if(!empty($row['tag']))
 						$element->setTags(explode(';',$row['tag']));
+
 					$arrayResultat[$element->getName()] = $element;
+				}
+				if(count($arrayResultat) > 1){
+					$links = LinkDao::getAll();
+				}elseif(count($arrayResultat) == 1){
+					$links = LinkDao::getForElement($element);
+				}else{
+					$links = array();
+				}
+
+				foreach ($links as $link) {
+					if($link->getType() == Link::typeRequire){
+						$innerLinks = $link->toInnerLink($arrayResultat);
+						$arrayResultat[$link->getAllow()]->addNeed($innerLinks['need']);
+						$arrayResultat[$link->getNeed()]->addAllow($innerLinks['allow']);
+					}
+					if($link->getType() == Link::typeExtends){
+
+					}
 				}
 				return $arrayResultat;
 			}

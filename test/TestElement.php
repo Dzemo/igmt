@@ -14,11 +14,5 @@
 		echo $elem."<br>";
 	}
 
-	/* Test getByName*/
-	echo "<br/>ElementDao::getByName() where name = 'Hut'<br/>";
-	$name = 'Hut';
-	$array = ElementDao::getByName($name);
-	echo $array;
-
 
 ?>
