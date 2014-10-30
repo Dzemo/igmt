@@ -1,0 +1,53 @@
+/* Css Général */
+html, body {
+  background-color: @cloud;
+  color: @midnight_blue;
+  margin:0;
+  padding:0;
+  height:100%;
+}
+#wrapper{
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -3em;
+}
+
+#push, #footer{
+  height: 3em;
+  clear: both;
+}
+
+/* Concerne le footer */
+#footer{
+  text-align: center;
+  position: relative;
+  bottom: 0px;
+  line-height:3em;
+  width:99%; //à 100% ça créer une barre de scroll horizontal
+
+  span {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: normal;      
+  }
+}
+
+a{
+  text-decoration: none;
+}
+
+#footer, #header{
+  a{
+    text-decoration: none;
+    color: @belize_hole;
+  }
+
+  a:visited{
+    color: @amethyst;
+  }
+
+  a:hover{
+    text-decoration: underline;
+  }
+}
