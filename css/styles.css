@@ -1,5 +1,6 @@
 /* Css Général */
 /* Concerne le footer */
+/* Les modaux */
 /* Définition des couleurs flatuicolors.com */
 /* Définition des couleurs du jeu */
 /* Elements table */
@@ -49,6 +50,9 @@ a {
 #footer a:hover,
 #header a:hover {
   text-decoration: underline;
+}
+.modal {
+  display: none;
 }
 .ressource {
   color: #27ae60;
