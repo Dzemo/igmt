@@ -9,6 +9,8 @@
 		<tbody>
 			<?php
 				$elements = ElementDao::getAll();
+				$categories = CategoryDao::getAll();
+
 				foreach ($elements as $element_index => $element) {
 				?>
 					<tr>
@@ -22,7 +24,8 @@
 										<li id="<?php echo "element-".$element->trimedName()."-need-".$target->trimedName();?>"											
 											>
 											<a 	href="#element-.<?php echo $target->trimedName();?>"
-												class="<?php echo $target->getCategory();?> toolip"
+												class="toolip"
+												<?php echo $target->getCategory()->cssStyle();?>
 												>
 												<?php echo $target->getName();?>
 											</a>
@@ -44,7 +47,7 @@
 						<td class="elements-list-td element-td">
 							<!-- Element -->
 							<div class="name">
-								<span class="<?php echo $element->getCategory();?>">
+								<span <?php echo $element->getCategory()->cssStyle();?>>
 									<?php echo $element->getName();?>
 								</span>
 							</div>
@@ -80,7 +83,8 @@
 										<li id="<?php echo "element-".$element->trimedName()."allow-".$allow->getTarget()->trimedName();?>"
 											>
 											<a href="#element-.<?php echo $target->trimedName();?>"
-												class="<?php echo $target->getCategory();?> toolip"
+												class="toolip"												
+												<?php echo $target->getCategory()->cssStyle();?>
 												>
 												<?php echo $target->getName();?>												
 											</a>
@@ -99,9 +103,10 @@
 							</ul>
 						</td>
 
-						<td>
+						<td class="elements-list-td edit-td">
 							<!-- Edit -->
-
+							<button type="button" onclick="$('#edit-element-<?php echo $element->trimedName();?>').bPopup();">Edit</button>
+							<?php printModalEditElement($element, $categories);?>
 						</td>
 					</tr>
 				<?php
@@ -111,7 +116,7 @@
 	</table>
 </div>
 <script type="text/javascript">
-	
+
 </script>
 
 <?php

@@ -20,6 +20,7 @@
 
 	//White background
 	$blanc = imagecolorallocate($image, 255, 255, 255);
+	$noir = imagecolorallocate($image, 0, 0, 0);
 
 	//Gather category color
 	$categories = CategoryDao::getAll();
@@ -29,21 +30,30 @@
 		$colorsForCategory[$category->getName()] = imagecolorallocate($image, $hexColor[0], $hexColor[1], $hexColor[2]);
 	}
 	//default black color
-	$colorsForCategory['default'] = imagecolorallocate($image, 0, 0, 0);
+	$colorsForCategory['default'] = $noir;
 
 	//Printing the Elements
 	$treePos = drawTreeElements($image, $tree, $font, $margin_x, $margin_y, $space_x, $space_y, $colorsForCategory);
 
+	echo '<br>';
+
 	//Drawing arrows
 	foreach ($treePos as $name => $treeElem) {
 		$element = $treeElem['element'];
-		foreach ($element->getNeed() as $need) {
-			$target = $need->getTarget();
 
-			$start_x = ($treePos[$target->getName()]['x']+$treePos[$target->getName()]['width'])/2;
-			$start_y = $treePos[$target->getName()]['y'] + $treePos[$target->getName()]['height'] + $space_arrow_up;
-			$end_x = ($treeElem['x']+$treeElem['width'])/2;
-			$end_y = $treeElem['y']-$space_arrow_down;
+		foreach ($element->getAllow() as $allow) {
+			$target = $allow->getTarget();
+
+			$start_x = ($treeElem['x']+($treeElem['width'])/2);
+			$start_y = $treeElem['y'] + $treeElem['height'] + $space_arrow_up;
+
+			$end_x = ($treePos[$target->getName()]['x']+($treePos[$target->getName()]['width'])/2);
+			$end_y = $treePos[$target->getName()]['y'] - $space_arrow_down;
+
+
+
+
+			echo "arrow from ".$element->getName()."(x=".$start_x.") to ".$target->getName()."(x=".$end_x.")<br>";
 
 			arrow($image, $start_x, $start_y, $end_x, $end_y, 3, 3, $noir);
 		}
@@ -52,6 +62,6 @@
 	//Output image
 	imagepng($image, "../images/generation/elements_tree.png");
 
-	header('Location: '.$GLOBALS['dns'].'index.php?page=elements_tree');
+	//header('Location: '.$GLOBALS['dns'].'index.php?page=elements_tree');
 ?>
 
