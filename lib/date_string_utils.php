@@ -30,7 +30,7 @@
 		$date = new DateTime();
 		$date->setTimestamp($timestamp);
 		$date->setTimezone(new DateTimeZone($timezone));
-		return $date->format("l j M G:i");
+		return $date->format("l j M Y - G:i");
 	}
 	
 	/**

@@ -12,65 +12,6 @@
 	require_once("line_intersect_check.php");
 	
 	/**
-	 * Take a tree of Elements and attempte to draw the while minimizing the number of intersection between arrows
-	 * @param  ressource $image
-	 * @param  array 	 $tree     		Array containing the tree of the element
-	 * @param  int 		 $font     
-	 * @param  int 		 $margin_x   	Margin from the border
-	 * @param  int 		 $margin_y   	Margin from the border
-	 * @param  int 		 $space_x    	Space between Element
-	 * @param  int 		 $space_y    	Space between Element
-	 * @param  int 		 $space_arrow 	Space between text and start/end of arrows
-	 * @param  array 	 $colors 		Array with an array for all colors, the colors for the arrows and the background
-	 */
-	function drawElementsTree($image, $original_tree, $font, $margin_x, $margin_y, $space_x, $space_y, $space_arrow, $colors){
-		echo "<br>===== Shuffeling =====<br>";
-		//check arrows intersection
-		$start = time();
-		$limit_time = 10; //Limit time for removing intersection
-		$hash_pool = array();//Pool of trees resulting of a shuffle of the original_tree
-		$min_intersect = 10000000;
-		$print_candidate = array("strings" => array(), "arrows" => array());
-		do{
-			//Shuffle the tree to try a new adjustement of the tree
-			$arrayShuffle = shuffleTree($original_tree);
-			$hash = $arrayShuffle['hash'];
-			if(!array_key_exists($hash, $hash_pool)){
-				echo " => testing<br>";
-				$hash_pool[$hash] = true;
-				$current_tree = $arrayShuffle['tree'];
-
-				//Calculating position of string and arrow for adjustement
-				$stringsElements = buildStringsElements($image, $arrayShuffle['tree'], $font, $margin_x, $margin_y, $space_x, $space_y, $colors['categories']);
-				$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $colors['arrow']);
-
-				//Count the number of intersection in the adjustement
-				$array_intersection = countArrowsIntersection($arrowsElements);
-				$count_intersect = $array_intersection['count_intersect'];
-				$count_potential_intersect = $array_intersection['count_potential_intersect'];
-				
-				echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect)<br>";
-
-				if($count_intersect < $min_intersect){
-					$min_intersect = $count_intersect;
-					echo "Better tree found!<br>";
-					$print_candidate['arrows'] = $arrowsElements;
-					$print_candidate['strings'] = $stringsElements;
-				}
-			}
-			else{
-				echo " => already tested<br>";
-			}
-
-		}while($min_intersect > 0 && time() - $start < $limit_time);
-
-		//Finallay, draw the chosen tree
-		drawElements($image, $print_candidate['strings'], $print_candidate['arrows'], $font, $colors);
-		echo "<br>===== End of generation =====<br>";
-	}
-
-
-	/**
 	 * Shuffle the $tree and return an hash representing this shuffle
 	 * @param  array $tree 
 	 * @return array Array contaigin the hash representing this tree and the tree
@@ -134,10 +75,11 @@
 	 * @param  resource $image           
 	 * @param  array $stringsElements 
 	 * @param  array $arrowsElements  
+	 * @param  int $font_size
+	 * @param  string $font_file
 	 * @param  array $colors
-	 * @param  int $font               
 	 */
-	function drawElements($image, $stringsElements, $arrowsElements, $font, $colors){
+	function drawElements($image, $stringsElements, $arrowsElements, $font_size, $font_file, $colors){
 		echo "<br>===== Start Drawning =====<br>";
 
 		//Draw each arrows
@@ -149,8 +91,9 @@
 		//Draw each string
 		foreach ($stringsElements as $string) {
 			echo "Drawning ".$string['element']->getName()." [".$string['x']." ; ".$string['y']."]<br>";
-			imagefilledrectangle ($image, $string['x'], $string['y'], $string['x']+$string['width'], $string['y']+$string['height'], $colors['background-alpha']);
-			imagestring($image, $font, $string['x'], $string['y'], $string['element']->getName(), $string['color']);
+			imagefilledrectangle ($image, $string['x'], $string['y'], $string['x']+$string['width'], $string['y']+$string['height']+1, $colors['background-alpha']);
+			//imagestring($image, $font, $string['x'], $string['y'], $string['element']->getName(), $string['color']);
+			imagettftext($image, $font_size, 0, $string['x'], $string['y']+$string['height'], $string['color'], $font_file, $string['element']->getName());
 		}
 	}
 
@@ -198,7 +141,8 @@
 	 * Build the array containing all the string position and their colors
 	 * @param  ressource $image
 	 * @param  array $tree     Array containing the tree of the element
-	 * @param  int $font     
+	 * @param  int $font_size
+	 * @param  string $font_file
 	 * @param  int $margin_x   Margin from the border
 	 * @param  int $margin_y   Margin from the border
 	 * @param  int $space_x    Space between Element
@@ -206,7 +150,7 @@
 	 * @param  array $colors
 	 * @return array           Array with all the informations of the element ['x', 'y', 'element', 'height', 'width', 'color'] indexed by name of elements
 	 */
-	function buildStringsElements($image, $tree, $font, $margin_x, $margin_y, $space_x, $space_y, $colors){
+	function buildStringsElements($image, $tree, $font_size, $font_file, $margin_x, $margin_y, $space_x, $space_y, $colors){
 		$treePrintedElements = array();
 		$offset_y = $margin_y-1;
 
@@ -216,15 +160,15 @@
 			//Computing real x spacing because $space_x is only the minimum (when there is less element on a level)
 			$available_width = imagesx($image) - 2*$margin_x;
 			foreach ($tree_level as $index => $element){
-				$available_width -= strlen($element->getName()) * imagefontwidth($font);
+				$available_width -= getTextSize($element->getName(), $font_size, $font_file)['width'];
 			}
 			$true_space_x = $available_width / count($tree_level);
 			$true_offset_x = $margin_x-1 + $true_space_x/2;
 
 			//For each elements on this level
 			foreach ($tree_level as $index => $element) {
-				$height = imagefontheight($font);
-				$width = strlen($element->getName()) * imagefontwidth($font);
+				$height = getTextSize($element->getName(), $font_size, $font_file)['height'];
+				$width = getTextSize($element->getName(), $font_size, $font_file)['width'];
 
 				$treePrintedElements[$element->getName()] = array(
 						'x' => $true_offset_x,
@@ -376,25 +320,27 @@
 
 	/**
 	 * Compute de height of the image from the size of the font and the elements in the tree
-	 * @param  array $tree         
-	 * @param  int $font 
+	 * @param  array $tree   
+	 * @param  int $font_size
+	 * @param  string $font_file
 	 * @param  int $margin_y        
 	 * @return int               
 	 */
-	function getImageHeight($tree, $font, $margin_y, $space_y){
+	function getImageHeight($tree, $font_size, $font_file, $margin_y, $space_y){
 		$count = count($tree);
-		return 2*$margin_y + $count*imagefontheight($font) + ($count-1)*$space_y;
+		return 2*$margin_y + $count*$font_size + ($count-1)*$space_y;
 	}
 
 	/**
 	 * Compute de width of the image from the size of the font and the elements in the tree
 	 * For debug use
 	 * @param  array $tree     
-	 * @param  int $font     
+	 * @param  int $font_size
+	 * @param  string $font_file     
 	 * @param  int $margin_x 
 	 * @return int           
 	 */
-	function getImageWidth($tree, $font, $margin_x, $space_x){
+	function getImageWidth($tree, $font_size, $font_file, $margin_x, $space_x){
 
 		//Search for the deep with the most elements
 		$max_elements = 0;
@@ -419,14 +365,29 @@
 		foreach ($tree[$max_deep] as $element) {
 			if($first){
 				$first = false;
-				$width += strlen($element->getName()) * imagefontwidth($font);
+				$width += getTextSize($element->getName(), $font_size, $font_file)['width'];
 			}
 			else{
-				$width += $space_x + strlen($element->getName()) * imagefontwidth($font);
+				$width += $space_x + getTextSize($element->getName(), $font_size, $font_file)['width'];
 			}
 		}
 
 		return $width;
+	}
+
+	/**
+	 * Calculate the width / height of the text with the specified font and size
+	 * @param  string $text      
+	 * @param  int $font_size 
+	 * @param  string $font_file Path to font file
+	 * @return arra            ['width', 'height']
+	 */
+	function getTextSize($text, $font_size, $font_file){
+		$type_space = imagettfbbox($font_size, 0, $font_file, $text);
+		$image_width = abs($type_space[4] - $type_space[0]);
+		$image_height = abs($type_space[5] - $type_space[1]);
+
+		return array('width' => $image_width, 'height' => $image_height);
 	}
 
 	/**
@@ -457,7 +418,7 @@
 	 * @param  int $deep 
 	 */
 	function printTreeLevel($tree, $deep){
-		echo "Deep ".$deep.":";
+		echo "Level ".$deep.":";
 		foreach ($tree[$deep] as $tree_level) {
 			echo " ".$tree_level->getName();
 		}

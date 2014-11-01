@@ -1,28 +1,54 @@
 <?php
-	require_once("../lib/classloader.php");
-	require_once("../lib/image_generation_utils.php");
-	require_once("../config.php");
+	require_once(dirname(__FILE__)."/../lib/classloader.php");
+	require_once(dirname(__FILE__)."/../lib/date_string_utils.php");
+	require_once(dirname(__FILE__)."/../lib/image_generation_utils.php");
+	require_once(dirname(__FILE__)."/../config.php");
+
+
+	$start = time();
+	$limit_time = 15; //Limit time for generation
+
+	echo tmspToDateLong(time());
+	echo "<br>===== Start Generation =====<br>";
 
 	//Buil the tree from the elements
-	$tree = buildTree($elements = ElementDao::getAll());
+	$original_tree = buildTree($elements = ElementDao::getAll());
 
-	printTree($tree);
+
+	echo "<br>===== Tree =====<br>";
+	printTree($original_tree);
+
 
 	//Create the image
-	$font = 5;
-	$margin_x = 10;
-	$margin_y = 20;
-	$space_x = 15;
-	$space_y = 30;
+	$font_size = 20;
+	$font_file = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Calibri.ttf";
+	$margin_x = 20;
+	$margin_y = 30;
+	$space_x = 30;
+	$space_y = 60;
 	$space_arrow = 2;
-
-	$width = getImageWidth($tree, $font , $margin_x, $space_x);
-	$heigth = getImageHeight($tree, $font, $margin_y, $space_y);
-	$image = imagecreate($width, $heigth);
+	$image_path = "../images/generation/elements_tree.png";
+	$width = getImageWidth($original_tree, $font_size, $font_file, $margin_x, $space_x);
+	$heigth = getImageHeight($original_tree, $font_size, $font_file, $margin_y, $space_y);
+	$image = imagecreatetruecolor($width, $heigth);
 	imageantialias($image, true);
+
+
+	echo "<br>===== Image parameters =====<br>";
+	echo "width=$width<br>";
+	echo "heigth=$heigth<br>";
+	echo "image_path=$image_path<br>";
+	echo "font_size=$font_size<br>";
+	echo "font_file=$font_file<br>";
+	echo "margin_x=$margin_x<br>";
+	echo "margin_y=$margin_y<br>";
+	echo "space_x=$space_x<br>";
+	echo "space_y=$space_y<br>";
+	echo "space_arrow=$space_arrow<br>";
 
 	//White background
 	$blanc = imagecolorallocate($image, 255, 255, 255);
+	imagefill($image, 0, 0, $blanc);
 	$blanc_alpha = imagecolorallocatealpha($image, 255, 255, 255, 75);
 	$noir = imagecolorallocate($image, 0, 0, 0);
 
@@ -41,12 +67,63 @@
 	$colors['background'] = $blanc;
 	$colors['background-alpha'] = $blanc_alpha;
 
-	//Printing the Elements Tree
-	$treePos = drawElementsTree($image, $tree, $font, $margin_x, $margin_y, $space_x, $space_y, $space_arrow, $colors);
+	//Starting generate optimal position for Element name and arrows
+	echo "<br>===== Shuffeling =====<br>";
+	//check arrows intersection
+	$hash_pool = array();//Pool of trees resulting of a shuffle of the original_tree
+	$min_intersect = 10000000;
+	$print_candidate = array("strings" => array(), "arrows" => array());
+	do{
+		//Shuffle the tree to try a new adjustement of the tree
+		$arrayShuffle = shuffleTree($original_tree);
+		$hash = $arrayShuffle['hash'];
+		if(!array_key_exists($hash, $hash_pool)){
+			echo " => testing<br>";
+			$hash_pool[$hash] = true;
+			$current_tree = $arrayShuffle['tree'];
 
+			//Calculating position of string and arrow for adjustement
+			$stringsElements = buildStringsElements($image, $arrayShuffle['tree'], $font_size, $font_file, $margin_x, $margin_y, $space_x, $space_y, $colors['categories']);
+			$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $colors['arrow']);
+
+			//Count the number of intersection in the adjustement
+			$array_intersection = countArrowsIntersection($arrowsElements);
+			$count_intersect = $array_intersection['count_intersect'];
+			$count_potential_intersect = $array_intersection['count_potential_intersect'];
+			
+			echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect)<br>";
+
+			if($count_intersect < $min_intersect){
+
+				$min_intersect = $count_intersect;				
+				$print_candidate['arrows'] = $arrowsElements;
+				$print_candidate['strings'] = $stringsElements;
+
+				if($min_intersect == 0)
+					echo "<strong>Perfect tree found !</strong><br>";
+				else
+					echo "Better tree found!<br>";
+			}
+			else{
+				echo "This tree is not the tree you are looking for<br>";
+			}
+		}
+		else{
+			echo " => already tested<br>";
+		}
+
+	}while($min_intersect > 0 && time() - $start < $limit_time);
+
+	//Finallay, draw the chosen tree
+	drawElements($image, $print_candidate['strings'], $print_candidate['arrows'], $font_size, $font_file, $colors);
+
+	echo "<br>===== End of generation =====<br>";
+
+	echo "Image generate in ".(time() - $start)." second: ".count($print_candidate['strings'])." elements, ".count($print_candidate['arrows'])." arrows and ".$count_intersect."/".$count_potential_intersect." intersection (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." %)<br>";
+	
 	//Output image
-	imagepng($image, "../images/generation/elements_tree.png");
+	imagepng($image, $image_path);
 
-	//header('Location: '.$GLOBALS['dns'].'index.php?page=elements_tree');
+	echo "<br><a href=\"".$GLOBALS['dns']."index.php?page=elements_tree\">Back</a>";
 ?>
 
