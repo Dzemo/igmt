@@ -9,7 +9,7 @@
 	 * arrow  = arrow between to string representing a need link between them
 	 */
 
-	require_once("line_intersect_check.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."line_intersect_check.php");
 	
 	/**
 	 * Shuffle the $tree and return an hash representing this shuffle
@@ -92,7 +92,6 @@
 		foreach ($stringsElements as $string) {
 			echo "Drawning ".$string['element']->getName()." [".$string['x']." ; ".$string['y']."]<br>";
 			imagefilledrectangle ($image, $string['x'], $string['y'], $string['x']+$string['width'], $string['y']+$string['height']+1, $colors['background-alpha']);
-			//imagestring($image, $font, $string['x'], $string['y'], $string['element']->getName(), $string['color']);
 			imagettftext($image, $font_size, 0, $string['x'], $string['y']+$string['height'], $string['color'], $font_file, $string['element']->getName());
 		}
 	}
@@ -203,9 +202,6 @@
 	 */
 	function arrow($im, $x1, $y1, $x2, $y2, $alength, $awidth, $color) {
 
-	    if( $alength > 1 )
-	        arrow( $im, $x1, $y1, $x2, $y2, $alength - 1, $awidth - 1, $color );
-
 	    $distance = sqrt(pow($x1 - $x2, 2) + pow($y1 - $y2, 2));
 
 	    $dx = $x2 + ($x1 - $x2) * $alength / $distance;
@@ -223,9 +219,7 @@
 	    $y4 = $dy - $x2o * $k;
 
 	    imageline($im, $x1, $y1, $dx, $dy, $color);
-	    imageline($im, $x3, $y3, $x4, $y4, $color);
-	    imageline($im, $x3, $y3, $x2, $y2, $color);
-	    imageline($im, $x2, $y2, $x4, $y4, $color);
+	    imagefilledpolygon($im, array($x2, $y2, $x3, $y3, $x4, $y4), 3, $color);
 	}
 
 	/**

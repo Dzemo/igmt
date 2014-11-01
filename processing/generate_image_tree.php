@@ -4,9 +4,20 @@
 	require_once(dirname(__FILE__)."/../lib/image_generation_utils.php");
 	require_once(dirname(__FILE__)."/../config.php");
 
+	// Customize generation here 
+	$font_size = 20;
+	$font_file = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Calibri.ttf";
+	$margin_x = 20;		//Horizontal space between Element and border
+	$margin_y = 30;		//Vertical space between Element and border
+	$space_x = 30;		//Horizontal space between Element
+	$space_y = 60;		//Vertical space between Element
+	$space_arrow = 3;	//Space between Element and start/end of arrows
+	$image_path = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."images".DIRECTORY_SEPARATOR.".generation.".DIRECTORY_SEPARATOR."elements_tree.png";
+	$limit_time = 15; 		//Limit time for generation
+	$prefered_width = 1000;	//Prefered width of the image
 
+	// Start generating the image 
 	$start = time();
-	$limit_time = 15; //Limit time for generation
 
 	echo tmspToDateLong(time());
 	echo "<br>===== Start Generation =====<br>";
@@ -22,29 +33,29 @@
 	//Create the image
 	$font_size = 20;
 	$font_file = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Calibri.ttf";
-	$margin_x = 20;
+	$margin_x = 30;
 	$margin_y = 30;
-	$space_x = 30;
-	$space_y = 60;
+	$space_x = 40;
+	$space_y = 40;
 	$space_arrow = 2;
 	$image_path = "../images/generation/elements_tree.png";
-	$width = getImageWidth($original_tree, $font_size, $font_file, $margin_x, $space_x);
+	$width = max(getImageWidth($original_tree, $font_size, $font_file, $margin_x, $space_x), $prefered_width);
 	$heigth = getImageHeight($original_tree, $font_size, $font_file, $margin_y, $space_y);
 	$image = imagecreatetruecolor($width, $heigth);
 	imageantialias($image, true);
 
 
 	echo "<br>===== Image parameters =====<br>";
-	echo "width=$width<br>";
-	echo "heigth=$heigth<br>";
-	echo "image_path=$image_path<br>";
-	echo "font_size=$font_size<br>";
-	echo "font_file=$font_file<br>";
-	echo "margin_x=$margin_x<br>";
-	echo "margin_y=$margin_y<br>";
-	echo "space_x=$space_x<br>";
-	echo "space_y=$space_y<br>";
-	echo "space_arrow=$space_arrow<br>";
+	echo "width= ".$width."px<br>";
+	echo "heigth= ".$heigth."px<br>";
+	echo "image_path= $image_path<br>";
+	echo "font_size= ".$font_size."px<br>";
+	echo "font_file= $font_file<br>";
+	echo "margin_x= ".$margin_x."px<br>";
+	echo "margin_y= ".$margin_y."px<br>";
+	echo "space_x= ".$space_x."px<br>";
+	echo "space_y= ".$space_y."px<br>";
+	echo "space_arrow= ".$space_arrow."px<br>";
 
 	//White background
 	$blanc = imagecolorallocate($image, 255, 255, 255);

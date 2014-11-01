@@ -1,18 +1,21 @@
 <?php
-	require_once($_SERVER['DOCUMENT_ROOT']."/deep_blue/config.php");
-	require_once($_SERVER['DOCUMENT_ROOT']."/deep_blue/utils/less.inc.php");
+
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."config.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."less.inc.php");
 
 	$lessc = new lessc;
-	$$force_css_compile = true;
+	$css_file = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."css".DIRECTORY_SEPARATOR."styles.css";
+	$less_file = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."css".DIRECTORY_SEPARATOR."styles.less";
+
 	try{
 		if(isset($force_css_compile) && $force_css_compile == true){
 			$lessc->setPreserveComments(true);
-			$lessc->compileFile("css/styles.less","css/styles.css");
+			$lessc->compileFile($less_file,$css_file);
 		}
 		else{
-			$lessc->checkedCompile("css/styles.less","css/styles.css");	
+			$lessc->checkedCompile($less_file,$css_file);	
 		}
 	}catch(exception $e){
-		echo "Erreur less : " . $e->getMessage();
+		echo "An error occur while compiling less file : " . $e->getMessage();
 	}
 ?>
