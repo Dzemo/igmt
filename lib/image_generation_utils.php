@@ -1,12 +1,250 @@
 <?php
-/**
- * @package igmt.utils
- * @author Raphaël BIDEAU
- * @version 1.0
- *
- * Offer some method to generate the element tree image
- */
+	/**
+	 * @package igmt.utils
+	 * @author Raphaël BIDEAU
+	 * @version 1.0
+	 *
+	 * Offer some method to generate the element tree image
+	 * string = name of an element of the tree, so name of an Element
+	 * arrow  = arrow between to string representing a need link between them
+	 */
+
+	require_once("line_intersect_check.php");
 	
+	/**
+	 * Take a tree of Elements and attempte to draw the while minimizing the number of intersection between arrows
+	 * @param  ressource $image
+	 * @param  array 	 $tree     		Array containing the tree of the element
+	 * @param  int 		 $font     
+	 * @param  int 		 $margin_x   	Margin from the border
+	 * @param  int 		 $margin_y   	Margin from the border
+	 * @param  int 		 $space_x    	Space between Element
+	 * @param  int 		 $space_y    	Space between Element
+	 * @param  int 		 $space_arrow 	Space between text and start/end of arrows
+	 * @param  array 	 $colors 		Array with an array for all colors, the colors for the arrows and the background
+	 */
+	function drawElementsTree($image, $original_tree, $font, $margin_x, $margin_y, $space_x, $space_y, $space_arrow, $colors){
+		echo "<br>===== Shuffeling =====<br>";
+		//check arrows intersection
+		$start = time();
+		$limit_time = 10; //Limit time for removing intersection
+		$hash_pool = array();//Pool of trees resulting of a shuffle of the original_tree
+		$min_intersect = 10000000;
+		$print_candidate = array("strings" => array(), "arrows" => array());
+		do{
+			//Shuffle the tree to try a new adjustement of the tree
+			$arrayShuffle = shuffleTree($original_tree);
+			$hash = $arrayShuffle['hash'];
+			if(!array_key_exists($hash, $hash_pool)){
+				echo " => testing<br>";
+				$hash_pool[$hash] = true;
+				$current_tree = $arrayShuffle['tree'];
+
+				//Calculating position of string and arrow for adjustement
+				$stringsElements = buildStringsElements($image, $arrayShuffle['tree'], $font, $margin_x, $margin_y, $space_x, $space_y, $colors['categories']);
+				$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $colors['arrow']);
+
+				//Count the number of intersection in the adjustement
+				$array_intersection = countArrowsIntersection($arrowsElements);
+				$count_intersect = $array_intersection['count_intersect'];
+				$count_potential_intersect = $array_intersection['count_potential_intersect'];
+				
+				echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect)<br>";
+
+				if($count_intersect < $min_intersect){
+					$min_intersect = $count_intersect;
+					echo "Better tree found!<br>";
+					$print_candidate['arrows'] = $arrowsElements;
+					$print_candidate['strings'] = $stringsElements;
+				}
+			}
+			else{
+				echo " => already tested<br>";
+			}
+
+		}while($min_intersect > 0 && time() - $start < $limit_time);
+
+		//Finallay, draw the chosen tree
+		drawElements($image, $print_candidate['strings'], $print_candidate['arrows'], $font, $colors);
+		echo "<br>===== End of generation =====<br>";
+	}
+
+
+	/**
+	 * Shuffle the $tree and return an hash representing this shuffle
+	 * @param  array $tree 
+	 * @return array Array contaigin the hash representing this tree and the tree
+	 */
+	function shuffleTree($original_tree){
+		$hash = "";
+		$shuffle_tree = array();
+
+		foreach ($original_tree as $level => $original_tree_level) {
+			$hash .= "#";
+			
+			$shuffle_tree_level = array();
+			$key_set = array_keys($original_tree_level);
+			shuffle($key_set);
+			foreach ($key_set as $index) {
+				$hash .= "@".$original_tree_level[$index]->getName();
+				$shuffle_tree_level[] = $original_tree_level[$index];
+			}
+
+			$shuffle_tree[$level] = $shuffle_tree_level;
+		}
+		echo "<br>Hash: $hash";
+		return array('hash' => md5($hash), 'tree' => $shuffle_tree);
+	}
+
+	/**
+	 * Count the number of intersection bewteen arrow with different start and end and the total potential number of intersection
+	 * @param  array $arrowsElements 
+	 * @return array                 ['count_intersect', 'count_potential_intersect']
+	 */
+	function countArrowsIntersection($arrowsElements){
+		$count_intersect = 0;
+		$count_potential_intersect = 0;
+
+		for($i = 0; $i < count($arrowsElements); $i++){
+			$arrowA = $arrowsElements[$i];
+
+			$sa = array('start' => array('x' => $arrowA['start_x'], 'y' => $arrowA['start_y']),'end' => array('x' => $arrowA['end_x'], 'y' => $arrowA['end_y']));
+
+			for($j = $i+1; $j < count($arrowsElements); $j++){
+				$arrowB = $arrowsElements[$j];
+
+				//Check only arrow with different start and end
+				if($arrowA['element_start'] != $arrowB['element_start'] && $arrowA['element_end'] != $arrowB['element_end']){
+					$count_potential_intersect++;
+
+					$sb = array('start' => array('x' => $arrowB['start_x'], 'y' => $arrowB['start_y']),'end' => array('x' => $arrowB['end_x'], 'y' => $arrowB['end_y']));
+
+					if(LineIntersectionChecker::doLinesIntersect($sa, $sb)){
+						$count_intersect++;
+					}
+				}
+			}
+		}
+
+		return array('count_intersect' => $count_intersect, 'count_potential_intersect' => $count_potential_intersect);	
+	}
+
+	/**
+	 * Draw on the image the two array of string and arrows
+	 * @param  resource $image           
+	 * @param  array $stringsElements 
+	 * @param  array $arrowsElements  
+	 * @param  array $colors
+	 * @param  int $font               
+	 */
+	function drawElements($image, $stringsElements, $arrowsElements, $font, $colors){
+		echo "<br>===== Start Drawning =====<br>";
+
+		//Draw each arrows
+		foreach ($arrowsElements as $arrow) {
+			echo "Drawing ".$arrow['element_start']->getName()." -> ".$arrow['element_end']->getName()."<br>";
+			arrow($image, $arrow['start_x'], $arrow['start_y'], $arrow['end_x'], $arrow['end_y'], 3, 3, $arrow['color']);
+		}
+
+		//Draw each string
+		foreach ($stringsElements as $string) {
+			echo "Drawning ".$string['element']->getName()." [".$string['x']." ; ".$string['y']."]<br>";
+			imagefilledrectangle ($image, $string['x'], $string['y'], $string['x']+$string['width'], $string['y']+$string['height'], $colors['background-alpha']);
+			imagestring($image, $font, $string['x'], $string['y'], $string['element']->getName(), $string['color']);
+		}
+	}
+
+	/**
+	 * Build an array containing the position for all arrow
+	 * @param  resource 	$image           
+	 * @param  array 		$strings	Elements Array of all string to be print
+	 * @param  int 			$space_arrow Space between text and start/end of arrows
+	 * @param  resource 	$color           
+	 * @return array              		 Array with all the informations of the arrows ['start_x', 'start_y', 'end_x', 'end_y', 'color', 'element_start', 'element_end'] indexed by name of elements        
+	 */
+	function buildArrowsElements($image, $stringsElements, $space_arrow, $color){
+		$arrowsElements = array();
+
+		foreach ($stringsElements as $name => $treeElem) {
+			$element = $treeElem['element'];
+
+			foreach ($element->getAllow() as $allow) {
+				$target = $allow->getTarget();
+
+				$start_x = ($treeElem['x']+($treeElem['width'])/2);
+				$start_y = $treeElem['y'] + $treeElem['height'] + $space_arrow;
+
+				$end_x = ($stringsElements[$target->getName()]['x']+($stringsElements[$target->getName()]['width'])/2);
+				$end_y = $stringsElements[$target->getName()]['y'] - $space_arrow;
+
+				$arrowsElements[] =  array(	
+						'start_x' 	=> $start_x,
+						'start_y'	=> $start_y,
+						'end_x'		=> $end_x,
+						'end_y'		=> $end_y,
+						'color'		=> $color,
+						'element_start' => $element,
+						'element_end'	=> $target
+					);
+
+				echo "Arrow ".$element->getName()." -> ".$target->getName()."<br>";
+			}
+		}
+
+		return $arrowsElements;
+	}
+
+	/**
+	 * Build the array containing all the string position and their colors
+	 * @param  ressource $image
+	 * @param  array $tree     Array containing the tree of the element
+	 * @param  int $font     
+	 * @param  int $margin_x   Margin from the border
+	 * @param  int $margin_y   Margin from the border
+	 * @param  int $space_x    Space between Element
+	 * @param  int $space_y    Space between Element
+	 * @param  array $colors
+	 * @return array           Array with all the informations of the element ['x', 'y', 'element', 'height', 'width', 'color'] indexed by name of elements
+	 */
+	function buildStringsElements($image, $tree, $font, $margin_x, $margin_y, $space_x, $space_y, $colors){
+		$treePrintedElements = array();
+		$offset_y = $margin_y-1;
+
+		//For each level of the tree
+		foreach($tree as $deep => $tree_level){
+
+			//Computing real x spacing because $space_x is only the minimum (when there is less element on a level)
+			$available_width = imagesx($image) - 2*$margin_x;
+			foreach ($tree_level as $index => $element){
+				$available_width -= strlen($element->getName()) * imagefontwidth($font);
+			}
+			$true_space_x = $available_width / count($tree_level);
+			$true_offset_x = $margin_x-1 + $true_space_x/2;
+
+			//For each elements on this level
+			foreach ($tree_level as $index => $element) {
+				$height = imagefontheight($font);
+				$width = strlen($element->getName()) * imagefontwidth($font);
+
+				$treePrintedElements[$element->getName()] = array(
+						'x' => $true_offset_x,
+						'y' => $offset_y,
+						'element' => $element,
+						'height' => $height,
+						'width' => $width,
+						'color' => getColorForCategory($element->getCategory(), $colors)
+					);
+				
+				echo "String: ".$element->getName()." [".$treePrintedElements[$element->getName()]['x']." ; ".$treePrintedElements[$element->getName()]['y']."]<br>";
+				$true_offset_x += $true_space_x + $width;
+			}
+			
+			$offset_y += $space_y + $height;
+		}
+
+		return $treePrintedElements;
+	}
+
 	/**
 	 * Draw an arrow line form [x1, y1] to [x2, y1] on the image $im of the color $color.
 	 * The arrow will have a length of $alength and width $awidth
@@ -44,60 +282,6 @@
 	    imageline($im, $x3, $y3, $x4, $y4, $color);
 	    imageline($im, $x3, $y3, $x2, $y2, $color);
 	    imageline($im, $x2, $y2, $x4, $y4, $color);
-	}
-
-	/**
-	 * Print all the name of the element in the tree with the specified font 
-	 * @param  ressource $image
-	 * @param  array $tree     Array containing the tree of the element
-	 * @param  int $font     
-	 * @param  int $margin_x   Margin from the border
-	 * @param  int $margin_y   Margin from the border
-	 * @param  int $space_x    Space between Element
-	 * @param  int $space_y    Space between Element
-	 * @param  array $colors
-	 * @return array           Array with all the informations of the printed element ['x', 'y', 'element', 'height', 'width', 'color']
-	 *                         indexed by name of elements
-	 */
-	function drawTreeElements($image, $tree, $font,  $margin_x, $margin_y, $space_x, $space_y, $colors){
-		$treePrintedElements = array();
-		$offset_y = $margin_y-1;
-
-		//For each level of the tree
-		foreach($tree as $deep => $tree_level){
-
-			//Computing real x spacing because $space_x is only the minimum (when there is less element on a level)
-			$available_width = imagesx($image) - 2*$margin_x;
-			foreach ($tree_level as $index => $element){
-				$available_width -= strlen($element->getName()) * imagefontwidth($font);
-			}
-			$true_space_x = $available_width / count($tree_level);
-			$true_offset_x = $margin_x-1 + $true_space_x/2;
-
-			//For each elements on this level
-			foreach ($tree_level as $index => $element) {
-				$height = imagefontheight($font);
-				$width = strlen($element->getName()) * imagefontwidth($font);
-
-				$treePrintedElements[$element->getName()] = array(
-						'x' => $true_offset_x,
-						'y' => $offset_y,
-						'element' => $element,
-						'height' => $height,
-						'width' => $width,
-						'color' => getColorForCategory($element->getCategory(), $colors)
-					);
-				
-				echo "Writing ".$element->getName().": x=".$treePrintedElements[$element->getName()]['x']." width=".$treePrintedElements[$element->getName()]['width']."<br>";
-				//print the string
-				imagestring($image, $font, $treePrintedElements[$element->getName()]['x'], $treePrintedElements[$element->getName()]['y'], $element->getName(), $treePrintedElements[$element->getName()]['color']);
-
-				$true_offset_x += $true_space_x + $width;
-				$offset_y += $space_y + $height;
-			}
-		}
-
-		return $treePrintedElements;
 	}
 
 	/**
