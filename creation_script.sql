@@ -10,6 +10,9 @@ CREATE TABLE igmt_element (
 
 INSERT INTO igmt_element (name, category, description, tag) VALUES ('Hut', 'Building', 'Increase maximum population', '');
 INSERT INTO igmt_element (name, category, description, tag) VALUES ('Wood', 'Ressource', 'Ressource to build stuff', '');
+INSERT INTO igmt_element (name, category, description, tag) VALUES ('Workshop', 'Building', 'You can develop some usefull tools here', '');
+INSERT INTO igmt_element (name, category, description, tag) VALUES ('Apple fall', 'Event', 'An appel has fallan from a tree', '');
+INSERT INTO igmt_element (name, category, description, tag) VALUES ('Laboratory', 'Building', 'You can research some usefull tech here', '');
 INSERT INTO igmt_element (name, category, description, tag) VALUES ('Population Increase 10', 'Event', 'Increase maximum population by 10', '');
 
 
@@ -27,7 +30,10 @@ CREATE TABLE igmt_link (
 );
 
 INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Wood', 'Hut', 'REQUIRE','Wood > 0');
+INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Wood', 'Workshop', 'REQUIRE','Wood > X');
 INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Hut', 'Population Increase 10', 'REQUIRE','Hut built');
+INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Apple fall', 'Laboratory', 'REQUIRE','');
+INSERT INTO igmt_link (need, allow, type, conditions) VALUES ('Workshop', 'Laboratory', 'REQUIRE','');
 
 
 DROP TABLE IF EXISTS igmt_category;

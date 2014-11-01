@@ -4,3 +4,4 @@ phpdoc.bat
 log/*
 images/generation/*
 class/Dao.class.php
+database_info.php
