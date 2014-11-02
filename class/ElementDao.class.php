@@ -42,7 +42,7 @@ class ElementDao extends Dao{
 				$allCategories = CategoryDao::getAll();
 				while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
 					$element = new Element($row['name'],$allCategories[$row['category']]);
-					$element->setDescription('');
+					$element->setDescription($row['description']);
 					if(!empty($row['tag']))
 						$element->setTags(explode(';',$row['tag']));
 

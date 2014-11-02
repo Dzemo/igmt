@@ -82,7 +82,7 @@ class Category{
 		if($color == null || !is_string($color) || strlen($color) == 0)
 			throw new InvalidArgumentException ("color must be a none empty string");
 		else if(strlen($color) > 7)
-			throw new InvalidArgumentException ("color length must be less thant 40");
+			throw new InvalidArgumentException ("color length must be less thant 7");
 		$this->color = $color ;
 	}
 	////////////////////
@@ -98,10 +98,21 @@ class Category{
 	}
 
 	/**
-	 * Echo the css style for this category
+	 * Return the css class requiremenet for an html file with single quote
+	 * @return string
 	 */
-	public function cssStyle(){
-		echo " style='color:".$this->color."' ";
+	public function cssHTML(){
+		return " class='".$this->trimedName()."' ";
+	}
+
+	/**
+	 * Return the css definition for the class of this category
+	 * @return string 
+	 */
+	public function cssClass(){
+		echo ".".$this->trimedName()."{\n";
+		echo "   color:".$this->color."\n";
+		echo "}";
 	}
 	
 	/**

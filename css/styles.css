@@ -1,9 +1,13 @@
+/* Définition des couleurs flatuicolors.com */
+/* Définition des couleurs du jeu */
 /* Css Général */
 /* Concerne le footer */
 /* Les modaux */
-/* Définition des couleurs flatuicolors.com */
-/* Définition des couleurs du jeu */
 /* Elements table */
+/* Edit form */
+.Test {
+  color: #7f8c8d;
+}
 html,
 body {
   background-color: ;
@@ -53,21 +57,73 @@ a {
 }
 .modal {
   display: none;
+  background-color: #ecf0f1;
+  border: 1px solid #2c3e50;
+  padding: 2%;
 }
-.ressource {
-  color: #27ae60;
+table.form-table {
+  border-collapse: collapse;
+  margin: auto;
+  width: 100%;
 }
-.technologie {
-  color: #2980b9;
+table.form-table td.input-td {
+  text-align: left;
+  padding: 1% 1% 1% 3%;
+  width: 70%;
 }
-.building {
-  color: #2c3e50;
+table.form-table td.input-td input,
+table.form-table td.input-td select,
+table.form-table td.input-td textarea {
+  width: 100%;
 }
-.event {
-  color: #c0392b;
+table.form-table td.label-td {
+  text-align: right;
+  padding: 1% 3% 1% 1%;
+  width: 30%;
 }
-.test {
-  color: #7f8c8d;
+table.form-table td.button-td {
+  text-align: center;
+}
+.form-title {
+  text-align: center;
+  padding: 5px 10px;
+  font-size: 30px;
+  font-family: 'Calibri', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  text-shadow: 0px 1px 1px #95a5a6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.1);
+}
+.form-content {
+  min-height: 500px;
+}
+div.form-button {
+  text-align: center;
+  padding: 5px 10px;
+}
+input,
+textarea {
+  border: 1px solid #ccc;
+  padding: 6px 4px;
+  outline: none;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  font: 12px "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #777;
+  margin: 0;
+  background: #fff;
+}
+input:focus,
+textarea:focus {
+  border: 1px solid #aaa;
+  color: #444;
+  -webkit-box-shadow: 0 0 3px #8eaaca;
+  box-shadow: 0 0 3px #8eaaca;
+}
+input:disabled,
+textarea:focus {
+  background: none;
 }
 .elements-list-table {
   border-collapse: collapse;
@@ -113,6 +169,21 @@ a {
 .need-td ul .condition,
 .allow-td ul .condition {
   font-style: italic;
+}
+.need-td .buttons-td,
+.allow-td .buttons-td {
+  text-align: center;
+}
+.modal-edit-element {
+  width: 40%;
+}
+.from-table-link {
+  border-collapse: collapse;
+}
+.from-table-link td {
+  border: 1px solid #2c3e50;
+  padding: 2px;
+  text-align: center;
 }
 #elements-tree {
   text-align: center;

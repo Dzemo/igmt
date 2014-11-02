@@ -43,7 +43,7 @@ CREATE TABLE igmt_category (
 	CONSTRAINT pk_igmt_category PRIMARY KEY (name)
 );
 
-INSERT INTO igmt_category (name, color) VALUES ('Building', '#332516');
-INSERT INTO igmt_category (name, color) VALUES ('Ressource', '#2dce3c');
-INSERT INTO igmt_category (name, color) VALUES ('Technology', '#2d53ce');
-INSERT INTO igmt_category (name, color) VALUES ('Event', '#ce2d2d');
+INSERT INTO igmt_category (name, color) VALUES ('Building', '#2c3e50');
+INSERT INTO igmt_category (name, color) VALUES ('Ressource', '#27ae60');
+INSERT INTO igmt_category (name, color) VALUES ('Technology', '#2980b9');
+INSERT INTO igmt_category (name, color) VALUES ('Event', '#c0392b');

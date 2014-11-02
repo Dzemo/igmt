@@ -17,10 +17,18 @@
 		<script type="text/javascript" language="javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
 		<script type="text/javascript" language="javascript" src="js/jquery-ui.min.js"></script>
-		<!-- CSS GENERAL -->
+		<!-- SumoSelect -->
+		<link rel="stylesheet" type="text/css" href="css/sumoselect.css">
+		<script type="text/javascript" language="javascript" src="js/jquery.sumoselect.js"></script>	
+		<!-- bPopup -->		
+		<script type="text/javascript" language="javascript" src="js/jquery.bpopup.min.js"></script>	
+		<!-- Noty -->
+		<script type="text/javascript" language="javascript" src="js/jquery.noty.packaged.min.js"></script>
+		<!-- CSS  -->
 		<link href="css/styles.css" rel="stylesheet" type="text/css" media="all" />
-		<!-- JS GENERAL -->		
-		<script type="text/javascript" language="javascript" src="js/jquery.bpopup.min.js"></script>
+		<link href="css/category.php" rel="stylesheet" type="text/css" media="all" />
+		<!-- JS -->
+		<script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
 	</head>
 	<body>
 	<div id="wrapper">
@@ -61,4 +69,48 @@
 		<span>IGMT | Flavio DEROO | Raphaël BIDEAU | <a href="LICENSE.md">Licence MIT</a></span>
 	</div>
 	</body>
+	<script type="text/javascript">
+		//see http://ned.im/noty/#options
+		$.noty.defaults = {
+		    layout: 'bottomRight',
+		    theme: 'defaultTheme',
+		    type: 'alert',
+		    text: '', // can be html or string
+		    dismissQueue: true, // If you want to use queue feature set this true
+		    template: '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+		    animation: {
+		        open: {height: 'toggle'},
+		        close: {height: 'toggle'},
+		        easing: 'swing',
+		        speed: 500 // opening & closing animation speed
+		    },
+		    timeout: 5000, // delay for closing event. Set false for sticky notifications
+		    force: false, // adds notification to the beginning of queue when set to true
+		    modal: false,
+		    maxVisible: 5, // you can set max visible notification for dismissQueue true option,
+		    killer: false, // for close all notifications before show
+		    closeWith: ['click'], // ['click', 'button', 'hover', 'backdrop'] // backdrop click will close all open notifications
+		    callback: {
+		        onShow: function() {},
+		        afterShow: function() {},
+		        onClose: function() {},
+		        afterClose: function() {}
+		    },
+		    buttons: false // an array of buttons
+		};
+
+		$(function(){
+			<?php 
+				if(isset($_SESSION['noty'])){
+					$json_noty_array = json_decode($_SESSION['noty']);
+					if(is_array($json_noty_array)){
+						foreach ($json_noty_array as $json_noty) {
+							echo "noty(".$json_noty.");\n";
+						}
+					}
+					unset($_SESSION['noty']);
+				}
+			?>
+		});
+	</script>
 </html>
