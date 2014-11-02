@@ -1,8 +1,21 @@
 <?php
-	require_once(dirname(__FILE__)."/../lib/classloader.php");
-	require_once(dirname(__FILE__)."/../lib/date_string_utils.php");
-	require_once(dirname(__FILE__)."/../lib/image_generation_utils.php");
-	require_once(dirname(__FILE__)."/../config.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."date_string_utils.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."image_generation_utils.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."config.php");
+
+	//All echo are catch to be output in a log file
+	ob_start();
+
+	$elements = array();
+	if(isset($_POST['category']) && strlen($_POST['category']) > 0){
+		$category = filter_var($_POST['category'], FILTER_SANITIZE_STRING);
+		$elements =  ElementDao::getByCategory();
+	}
+
+	if(count($elements) == 0){
+		$elements =  ElementDao::getAll();
+	}
 
 	// Customize generation here 
 	$font_size = 20;
@@ -12,33 +25,24 @@
 	$space_x = 30;		//Horizontal space between Element
 	$space_y = 60;		//Vertical space between Element
 	$space_arrow = 3;	//Space between Element and start/end of arrows
-	$image_path = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."images".DIRECTORY_SEPARATOR.".generation.".DIRECTORY_SEPARATOR."elements_tree.png";
 	$limit_time = 15; 		//Limit time for generation
 	$prefered_width = 1000;	//Prefered width of the image
 
 	// Start generating the image 
 	$start = time();
 
-	echo tmspToDateLong(time());
-	echo "<br>===== Start Generation =====<br>";
+	echo "===== Start Generation =====<br>";
+	echo tmspToDateLong(time())."<br>";
 
 	//Buil the tree from the elements
-	$original_tree = buildTree($elements = ElementDao::getAll());
+	$original_tree = buildTree($elements);
 
 
 	echo "<br>===== Tree =====<br>";
+	echo "Building tree of ".count($elements)." elements<br>";
 	printTree($original_tree);
 
-
-	//Create the image
-	$font_size = 20;
-	$font_file = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."Calibri.ttf";
-	$margin_x = 30;
-	$margin_y = 30;
-	$space_x = 40;
-	$space_y = 40;
-	$space_arrow = 2;
-	$image_path = "../images/generation/elements_tree.png";
+	//Create the image	
 	$width = max(getImageWidth($original_tree, $font_size, $font_file, $margin_x, $space_x), $prefered_width);
 	$heigth = getImageHeight($original_tree, $font_size, $font_file, $margin_y, $space_y);
 	$image = imagecreatetruecolor($width, $heigth);
@@ -48,7 +52,7 @@
 	echo "<br>===== Image parameters =====<br>";
 	echo "width= ".$width."px<br>";
 	echo "heigth= ".$heigth."px<br>";
-	echo "image_path= $image_path<br>";
+	echo "image_path= $tree_image_absolute_path<br>";
 	echo "font_size= ".$font_size."px<br>";
 	echo "font_file= $font_file<br>";
 	echo "margin_x= ".$margin_x."px<br>";
@@ -133,8 +137,13 @@
 	echo "Image generate in ".(time() - $start)." second: ".count($print_candidate['strings'])." elements, ".count($print_candidate['arrows'])." arrows and ".$count_intersect."/".$count_potential_intersect." intersection (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." %)<br>";
 	
 	//Output image
-	imagepng($image, $image_path);
+	imagepng($image, $tree_image_absolute_path);
 
-	echo "<br><a href=\"".$GLOBALS['dns']."index.php?page=elements_tree\">Back</a>";
+	$output = ob_get_contents();
+	ob_clean();
+
+	file_put_contents($tree_generation_log_path, $output);
+
+	echo json_encode(array('time' => time() - $start, 'date' => tmspToDateLong(time()), 'output' => $output ));
 ?>
 

@@ -1,3 +1,4 @@
+@import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
 /* Définition des couleurs flatuicolors.com */
 /* Définition des couleurs du jeu */
 /* Css Général */
@@ -188,10 +189,20 @@ textarea:focus {
 #elements-tree {
   text-align: center;
 }
-#elements-tree img {
-  margin: 5%;
+#elements-tree #image-tree {
+  margin: 5% 5% 0 5%;
   border: 1px solid #2c3e50;
 }
-#elements-tree span {
-  color: #2c3e50;
+#elements-tree #button-generate-element-tree #button-generate-element-tree-generating {
+  display: none;
+}
+#elements-tree #generation-log {
+  display: none;
+  border: 1px solid #2c3e50;
+  background-color: #eaeaea;
+  text-align: left;
+  font-size: 1em;
+  font-family: 'Droid Sans Mono', 'Courier New';
+  padding: 1%;
+  margin: 0 20%;
 }

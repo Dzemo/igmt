@@ -31,7 +31,9 @@ class ElementDao extends Dao{
 			return null;
 	}
 
-
+	public static function getByCategory($category){
+		return self::getByQuery("SELECT * FROM igmt_element WHERE category = ?",[$category]);
+	}
 
 
 

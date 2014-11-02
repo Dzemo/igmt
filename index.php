@@ -29,6 +29,7 @@
 		<link href="css/category.php" rel="stylesheet" type="text/css" media="all" />
 		<!-- JS -->
 		<script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
+		<script type="text/javascript" language="javascript" src="js/elements_tree.js"></script>
 	</head>
 	<body>
 	<div id="wrapper">
