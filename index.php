@@ -13,7 +13,7 @@
 		<title>Incremental Game Modeling Tool</title>
 		<meta name="keywords" content="" />
 		<meta name="description" content="" />
-		<!-- JQUERY && JQUERY UI-->
+		<!-- JQUERY & JQUERY UI-->
 		<script type="text/javascript" language="javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
 		<script type="text/javascript" language="javascript" src="js/jquery-ui.min.js"></script>
@@ -24,12 +24,11 @@
 		<script type="text/javascript" language="javascript" src="js/jquery.bpopup.min.js"></script>	
 		<!-- Noty -->
 		<script type="text/javascript" language="javascript" src="js/jquery.noty.packaged.min.js"></script>
+		<!-- jaxButton -->
+		<script type="text/javascript" language="javascript" src="js/jquery.jaxbutton.js"></script>
 		<!-- CSS  -->
 		<link href="css/styles.css" rel="stylesheet" type="text/css" media="all" />
 		<link href="css/category.php" rel="stylesheet" type="text/css" media="all" />
-		<!-- JS -->
-		<script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
-		<script type="text/javascript" language="javascript" src="js/elements_tree.js"></script>
 	</head>
 	<body>
 	<div id="wrapper">

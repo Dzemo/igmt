@@ -123,13 +123,40 @@
 		printModalEditElement(null, $categories, $elements);
 	?>
 </div>
+<script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
 <script type="text/javascript">
 	$(function(){
 		elements_option_list = "<?php echo getOptionElements($elements, null, null);?>";		
+
 		$('.sumo-select').SumoSelect();
 		$('.modal-edit-element .form-content').tabs({
 			heightStyle: 'auto',
 		});
+
+		$('.button-save').jaxButton({
+			url:"processing/ajax_edit_element.php", 
+			getData: function(dataset){
+				var form_id = dataset.formId;
+				var data = {
+								name: $('#'+form_id+'-input-name').val(),
+								description: $('#'+form_id+'-textarea-description').text(),
+								category: $('#'+form_id+'-select-category').val(),
+								need: getPostArrayForLink(form_id,'need'),
+								allow: getPostArrayForLink(form_id,'allow'),
+							};
+				return data;
+			},
+			before: function(dataset){
+				noty({text: 'Saving element '+$('#'+dataset.formId+'-input-name').val(), type:'information'});
+				},
+			done: function(dataset, data, textStatus, jqXHR){
+				try{
+					document.location.href=json.succes.redirect;
+				}catch(err){
+					noty({text: 'Error while parsing json response: '+err, type:'error'});
+				}
+			}
+		})
 	});
 </script>
 
@@ -226,8 +253,8 @@
 
 				</div>
 				<div class="form-button">
-					<button type="button" onclick="saveElement('<?php echo $form_id;?>')">Save</button>
-					<button type="button" onclick="$('#edit-element-<?php echo ($e ? $e->trimedName() : "new");?>').bPopup().close()">Cancel</button>
+					<button type="button" data-form-id="<?php echo $form_id;?>" class="button-save">Save</button>
+					<button type="button" class="button-cancel" onclick="$('#edit-element-<?php echo ($e ? $e->trimedName() : "new");?>').bPopup().close()">Cancel</button>
 				</div>
 			</form>
 		<?php

@@ -193,9 +193,6 @@ textarea:focus {
   margin: 5% 5% 0 5%;
   border: 1px solid #2c3e50;
 }
-#elements-tree #button-generate-element-tree #button-generate-element-tree-generating {
-  display: none;
-}
 #elements-tree #generation-log {
   display: none;
   border: 1px solid #2c3e50;

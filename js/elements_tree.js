@@ -1,34 +1,30 @@
-function generateTree(){
-	$('#button-generate-element-tree-generate').hide();
-	$('#button-generate-element-tree-generating').show();
+/**
+ * Add jaxButton to generate tree
+ */
+$(function(){
+	$('#button-generate').jaxButton({
+		url:"processing/ajax_generate_image_tree.php", 
+		done: function(dataset, data, textStatus, jqXHR){
+			try{
+				var json = jQuery.parseJSON(data);
 
-	var data_post = {};
+				$('#generation-date').text("Generated on "+json.date);
+				$('#generation-log').html(json.output);
+				noty({text: "Image generated in "+json.time+"s", type:'success'});
 
-	$.ajax({type:"POST",
-			url:"processing/ajax_generate_image_tree.php", 
-			data: data_post
-	}).always(function(){		
-		$('#button-generate-element-tree-generate').show();
-		$('#button-generate-element-tree-generating').hide();
+				previous_src = $('#image-tree').attr('src');
+				$('#image-tree').attr('src',previous_src.split('#')[0]+'#'+new Date());
 
-	}).done(function(result){
-		try{
-			var json = jQuery.parseJSON(result);
-
-			$('#generation-date').text("Generated on "+json.date);
-			$('#generation-log').html(json.output);
-			noty({text: "Image generated in "+json.time+"s", type:'success'});
-
-		}catch(err){
-			noty({text: 'Error while parsing json response', type:'error'});
+			}catch(err){
+				noty({text: 'Error while parsing json response: '+err, type:'error'});
+			}
 		}
-	}).error(function(jqXHR, textStatus, errorThrown){		
-		text = textStatus;
-		if(errorThrown) text+= ": "+errorThrown;
-		noty({text: text, type:'error'});
 	});
-}
+});
 
+/**
+ * Toggle the generation log
+ */
 function toggleGenerationLog(){
 	if($('#generation-log').is(':visible')){
 		$('#generation-log').hide();

@@ -23,13 +23,7 @@
 	<br>
 	<br>
 
-	<button id="button-generate-element-tree"
-			type="button"
-			onclick="generateTree()"
-			>
-			<span id="button-generate-element-tree-generate">Generate</span>
-			<span id="button-generate-element-tree-generating"><img src="images/ajax-loader.gif" alt="Generating"/></span>
-	</button>
+	<button type="button" id="button-generate">Generate</button>
 	<button id="button-toggle-generation-log"
 			type="button" 
 			onclick="toggleGenerationLog()"
@@ -51,3 +45,4 @@
 	</div>
 
 </div>
+<script type="text/javascript" language="javascript" src="js/elements_tree.js"></script>
