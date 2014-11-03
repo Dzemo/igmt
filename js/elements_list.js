@@ -1,34 +1,3 @@
-
-function saveElement(form_id){
-	noty({text: 'Saving element '+$('#'+form_id+'-input-name').val(), type:'information'});
-
-	var data_post = {
-		name: $('#'+form_id+'-input-name').val(),
-		description: $('#'+form_id+'-textarea-description').text(),
-		category: $('#'+form_id+'-select-category').val(),
-		need: getPostArrayForLink(form_id,'need'),
-		allow: getPostArrayForLink(form_id,'allow'),
-	};
-	console.log(data_post);
-	$.ajax({type:"POST",
-			url:"processing/ajax_edit_element.php", 
-			data: data_post
-	}).done(function(result){
-		try{
-			var json = jQuery.parseJSON(result);
-		}catch(err){
-			
-		}
-
-		document.location.href=json.succes.redirect;
-	}).error(function(jqXHR, textStatus, errorThrown){		
-		text = textStatus;
-		if(errorThrown) text+= ": "+errorThrown;
-		noty({text: text, type:'error'});
-	});
-
-}
-
 /**
  * Retrive post data for a link type
  * @param  {string} form_id   
@@ -67,7 +36,7 @@ function addLink(link, form_id, options_elements_list){
 	templateTd+= '		<input 	type="hidden"';
 	templateTd+= '			class="{{form_id}}-{{link}}-input-linkid"';
 	templateTd+= '			name="{{form_id}}-{{link}}-input-linkid-{{index}}"';
-	templateTd+= '			value="-1"';
+	templateTd+= '			value=""';
 	templateTd+= '			>';
 	templateTd+= '		<select';
 	templateTd+= '			id="{{form_id}}-{{link}}-select-element-{{index}}"';

@@ -62,7 +62,10 @@
 			$need = null;
 			if(isset($post_need['target_name']) && strlen($post_need['target_name']) > 0){
 				$target_name = filter_var($post_need['target_name'], FILTER_SANITIZE_STRING);
-				if(array_key_exists($target_name, $allElements)){
+				if($target_name == $element->getName()){
+					$errors[] = 'Element can\'t need themself';
+				}
+				else if(array_key_exists($target_name, $allElements)){
 					$need = new Need($link_id, $allElements[$target_name]);
 				}
 				else{
@@ -76,7 +79,8 @@
 				$need->setConditions($conditions);
 			}
 
-			$element->addNeed($need);
+			if($need)
+				$element->addNeed($need);
 		}
 	}
 
@@ -94,7 +98,10 @@
 			$allow = null;
 			if(isset($post_allow['target_name']) && strlen($post_allow['target_name']) > 0){
 				$target_name = filter_var($post_allow['target_name'], FILTER_SANITIZE_STRING);
-				if(array_key_exists($target_name, $allElements)){
+				if($target_name == $element->getName()){
+					$errors[] = 'Element can\'t allow themself';
+				}
+				else if(array_key_exists($target_name, $allElements)){
 					$allow = new Allow($link_id, $allElements[$target_name]);
 				}
 				else{
@@ -108,7 +115,8 @@
 				$allow->setConditions($conditions);
 			}
 
-			$element->addAllow($allow);
+			if($allow)
+				$element->addAllow($allow);
 		}
 	}
 

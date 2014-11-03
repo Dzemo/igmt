@@ -154,6 +154,9 @@
 					var json = jQuery.parseJSON(data);
 					if(json.hasOwnProperty('errors')){
 						console.log(json.errors);
+						for(var i in json.errors){
+							noty({text: json.errors[i], type:'error'});
+						}
 					}
 					else{
 						if(json.hasOwnProperty('redirect')){
