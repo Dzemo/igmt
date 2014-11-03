@@ -15,7 +15,7 @@ class Allow extends InnerLink{
 	
 	/**
 	 * Initilize a innerLink with the link_id and the target Element
-	 * @param int     $link_id Integer greater than 0
+	 * @param int     $link_id Integer greater than 0 or null
 	 * @param Element $target  Not null
 	 * @throws InvalidArgumentException
 	 */

@@ -70,7 +70,7 @@ class Element{
 		if($name == null || !is_string($name) || strlen($name) == 0)
 			throw new InvalidArgumentException ("name must be a none empty string");
 		else if(strlen($name) > 40)
-			throw new InvalidArgumentException ("name length must be less thant 40");
+			throw new InvalidArgumentException ("name length must be less than 40");
 		else if($category == null)
 			throw new InvalidArgumentException ("category can't be empty");
 		$this->name = $name;

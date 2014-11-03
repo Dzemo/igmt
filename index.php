@@ -1,4 +1,6 @@
 <?php
+	session_start();
+
 	require_once("lib/lessmake.php");
 	require_once("lib/classloader.php");
 	require_once("config.php");
@@ -98,19 +100,5 @@
 		    },
 		    buttons: false // an array of buttons
 		};
-
-		$(function(){
-			<?php 
-				if(isset($_SESSION['noty'])){
-					$json_noty_array = json_decode($_SESSION['noty']);
-					if(is_array($json_noty_array)){
-						foreach ($json_noty_array as $json_noty) {
-							echo "noty(".$json_noty.");\n";
-						}
-					}
-					unset($_SESSION['noty']);
-				}
-			?>
-		});
 	</script>
 </html>

@@ -61,15 +61,15 @@ class Link{
 	//////////////////
 	/**
 	 * Initialise a link with id, need and allow and a type. Conditions is set allow ""
-	 * @param int  $id   	Must be a integer greater than 0
+	 * @param int  $id   	Must be a integer greater than 0 or null for new link
 	 * @param string $need 
 	 * @param string $allow   
 	 * @param string $type Must be a not empty string in {typeRequire, typeExtends}
 	 * @throws InvalidArgumentException
 	 */
 	public function __construct($id, $need, $allow, $type){
-		if($id == null || !is_int($id) || $id <= 0)
-			throw new InvalidArgumentException ("id must be an integer greater than 0, input was: ".$id);
+		if($id != null && (!is_int($id) || $id <= 0))
+			throw new InvalidArgumentException ("id must be an integer greater than 0 or null, input was: ".$id);
 		else if($need == null)
 			throw new InvalidArgumentException ("need cannot be null");
 		else if($allow == null)
@@ -96,8 +96,8 @@ class Link{
 	 * @throws InvalidArgumentException
 	 */
 	public function setId($id){
-		if($id == null || !is_int($id) || $id <= 0)
-			throw new InvalidArgumentException ("id must be an integer greater thant 0, input was: ".$id);
+		if($id != null && (!is_int($id) || $id <= 0))
+			throw new InvalidArgumentException ("id must be an integer greater than 0, input was: ".$id);
 		
 		$this->id = $id ;
 	}

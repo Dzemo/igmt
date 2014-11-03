@@ -151,7 +151,20 @@
 				},
 			done: function(dataset, data, textStatus, jqXHR){
 				try{
-					document.location.href=json.succes.redirect;
+					var json = jQuery.parseJSON(data);
+					if(json.hasOwnProperty('errors')){
+						console.log(json.errors);
+					}
+					else{
+						if(json.hasOwnProperty('redirect')){
+							setTimeout(function(){
+								document.location.href=json.redirect;
+							},750);
+						}
+						if(json.hasOwnProperty('message')){
+							noty({text: json.message, type:'success'});
+						}
+					}					
 				}catch(err){
 					noty({text: 'Error while parsing json response: '+err, type:'error'});
 				}

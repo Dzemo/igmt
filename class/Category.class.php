@@ -65,7 +65,7 @@ class Category{
 		if($name == null || !is_string($name) || strlen($name) == 0)
 			throw new InvalidArgumentException ("name must be a none empty string");
 		else if(strlen($name) > 40)
-			throw new InvalidArgumentException ("name length must be less thant 40");
+			throw new InvalidArgumentException ("name length must be less than 40");
 		$this->name = $name ;
 	}
 	/**
@@ -82,7 +82,7 @@ class Category{
 		if($color == null || !is_string($color) || strlen($color) == 0)
 			throw new InvalidArgumentException ("color must be a none empty string");
 		else if(strlen($color) > 7)
-			throw new InvalidArgumentException ("color length must be less thant 7");
+			throw new InvalidArgumentException ("color length must be less than 7");
 		$this->color = $color ;
 	}
 	////////////////////

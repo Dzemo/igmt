@@ -34,15 +34,15 @@ abstract class InnerLink{
 	/////////////////
 	/**
 	 * Initilize a innerLink with the link_id and the target Element
-	 * @param int     $link_id Integer greater than 0
+	 * @param int     $link_id Integer greater than 0 or null for new link
 	 * @param Element $target  Not null
 	 * @throws InvalidArgumentException
 	 */
 	public function __construct($link_id, Element $target){
-		if($link_id == null || !is_int($link_id) || $link_id <= 0)
-			throw new InvalidArgumentException ("link_id must be an integer greater thant 0, input was: ".$link_id);
+		if($link_id != null && (!is_int($link_id) || $link_id <= 0))
+			throw new InvalidArgumentException ("link_id must be an integer greater than 0 or null, input was: ".$link_id);
 		else if($target == null)
-			throw new InvalidArgumentException ("target canno't be null");
+			throw new InvalidArgumentException ("target cannot be null");
 		
 		$this->link_id = $link_id;
 		$this->target = $target;
@@ -58,12 +58,12 @@ abstract class InnerLink{
 		return $this->link_id ;
 	}
 	/**
-	 * @param int $link_id Must be a integer greater than 0
+	 * @param int $link_id Must be a integer greater than 0 or null for new link
 	 * @throws InvalidArgumentException
 	 */
 	public function setLinkId($link_id){
-		if($link_id == null || !is_int($link_id) || $link_id <= 0)
-			throw new InvalidArgumentException ("link_id must be an integer greater thant 0, input was: ".$link_id);
+		if($link_id != null && (!is_int($link_id) || $link_id <= 0))
+			throw new InvalidArgumentException ("link_id must be an integer greater than 0 or null, input was: ".$link_id);
 		
 		$this->link_id = $link_id ;
 	}
@@ -79,7 +79,7 @@ abstract class InnerLink{
 	 */
 	public function setTarget(Element $target){
 		if($target == null)
-			throw new InvalidArgumentException ("target canno't be null");
+			throw new InvalidArgumentException ("target cannot be null");
 		
 		$this->target = $target ;
 	}
