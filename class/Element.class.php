@@ -48,19 +48,29 @@ class Element{
 	private $allow;
 	/**
 	 * Element extended by this element, may be null
-	 * @var Element
+	 * @var Extend
 	 */
-	private $extends;
+	private $extend;
 	/**
-	 * List of Elements that extends this element
-	 * @var array
+	 * List of Elements that extend this element
+	 * @var array Array of ExtendedBy
 	 */
 	private $extendedBy;
+	/**
+	 * List of Elements that this element can evolve into
+	 * @var array Array of Evolve
+	 */
+	private $evolve;
+	/**
+	 * The element that element have evolve from
+	 * @var Regress
+	 */
+	private $regress;
 	//////////////////
 	// CONSTRUCTOR //
 	//////////////////
 	/**
-	 * Initialise this Element description as emtpy string, tag, allow, need and extendedBy as empty array and extends as null
+	 * Initialise this Element description as emtpy string, tag, allow, need and extendedBy as empty array and extend as null
 	 *
 	 * @param string 	$name 		None empty string, max length 40
 	 * @param Category    $category  Object category expected
@@ -79,8 +89,10 @@ class Element{
 		$this->tags = array();
 		$this->need = array();
 		$this->allow = array();
-		$this->extends = null;
+		$this->extend = null;
 		$this->extendedBy = array();
+		$this->evolve = array();
+		$this->regres = null;
 	}
 	////////////////////////
 	// GETTER and SETTER //
@@ -174,16 +186,20 @@ class Element{
 			$this->allow = $allow ;
 	}
 	/**
-	 * @return Element
+	 * @return Extend
 	 */
-	public function getExtends(){
-		return $this->extends ;
+	public function getExtend(){
+		return $this->extend ;
 	}
 	/**
-	 * @param Element $extends
+	 * @param Extend $extend
+	 * @throws InvalidArgumentException
 	 */
-	public function setExtends(Element $extends){
-		$this->extends = $extends ;
+	public function setExtend(Extend $extend){
+		if($extend == null || $extend->getTarget()->getName() == $this->name)
+			throw new InvalidArgumentException ("The extend element can't be null or this element");
+
+		$this->extend = $extend ;
 	}
 	/**
 	 * @return array
@@ -197,6 +213,39 @@ class Element{
 	public function setExtendedBy($extendedBy){
 		if(is_array($extendedBy))
 			$this->extendedBy = $extendedBy ;
+	}
+
+
+
+
+	/**
+	 * @return Regress
+	 */
+	public function getRegress(){
+		return $this->regress ;
+	}
+	/**
+	 * @param Regress $regress
+	 * @throws InvalidArgumentException
+	 */
+	public function setRegress(Regress $regress){
+		if($regress == null || $regress->getTarget()->getName() == $this->name)
+			throw new InvalidArgumentException ("The regress element can't be null or this element");
+
+		$this->regress = $regress ;
+	}
+	/**
+	 * @return array
+	 */
+	public function getEvolve(){
+		return $this->evolve ;
+	}
+	/**
+	 * @param array $evolve
+	 */
+	public function setEvolve($evolve){
+		if(is_array($evolve))
+			$this->evolve = $evolve ;
 	}
 	////////////////////
 	// OTHER METHODS //
@@ -232,21 +281,28 @@ class Element{
 		return count($this->tags) > 0;
 	}
 	/**
-	 * Determine wether this Element extends another Element
-	 * @return boolean true if this element extends another Element, false otherwise
+	 * Determine wether this Element extend another Element
+	 * @return boolean true if this element extend another Element, false otherwise
 	 */
 	public function isExtending(){
-		return $this->extends != null;
+		return $this->extend != null;
+	}
+	/**
+	 * Determine wether this Element evolve from another element
+	 * @return boolean true if this element evolve from another Element, false otherwise
+	 */
+	public function isEvolveing(){
+		return $this->regress != null;
 	}
 	/**
 	 * Add an extension element to this element
 	 * The extension must be a different element and not null
-	 * @param Element $extenstion [description]
+	 * @param ExtendedBy $extenstion
 	 * @throws InvalidArgumentException
 	 */
-	public function addExtension(Element $extenstion){
-		if($extension == null || $extension->getName() == $this->name)
-			throw new InvalidArgumentException ("The extention element canno't be null or this element");
+	public function addExtension(ExtendedBy $extension){
+		if($extension == null || $extension->getTarget()->getName() == $this->name)
+			throw new InvalidArgumentException ("The extension element can't be null or this element");
 		$this->extendedBy[] = $extension;
 	}
 	/**
@@ -256,6 +312,26 @@ class Element{
 	public function hasExtension(){
 		return count($this->extendedBy) > 0;
 	}
+
+	/**
+	 * Add an extensioevolutionn element to this element
+	 * The evolution must be a different element and not null
+	 * @param Evolve $extenstion
+	 * @throws InvalidArgumentException
+	 */
+	public function addEvolution(Evolve $evolution){
+		if($evolution == null || $evolution->getTarget()->getName() == $this->name)
+			throw new InvalidArgumentException ("The evolve element can't be null or this element");
+		$this->evolve[] = $evolution;
+	}
+	/**
+	 * Determine wether this element has some evolution
+	 * @return boolean
+	 */
+	public function hasEvolution(){
+		return count($this->evolve) > 0;
+	}
+
 	/**
 	 * Add a allow link to this element
 	 * @param Allow $allow 
@@ -263,9 +339,9 @@ class Element{
 	 */
 	public function addAllow(Allow $allow){
 		if($allow == null)
-			throw new InvalidArgumentException ("allow canno't be null");
+			throw new InvalidArgumentException ("allow can't be null");
 		else if($allow->getTarget()->getName() == $this->name)
-			throw new InvalidArgumentException ("the allow target canno't be this element");
+			throw new InvalidArgumentException ("the allow target can't be this element");
 		$this->allow[] = $allow;
 	}
 	/**
@@ -282,9 +358,9 @@ class Element{
 	 */
 	public function addNeed(Need $need){
 		if($need == null)
-			throw new InvalidArgumentException ("need canno't be null");
+			throw new InvalidArgumentException ("need can't be null");
 		else if($need->getTarget()->getName() == $this->name)
-			throw new InvalidArgumentException ("the need target canno't be this element");
+			throw new InvalidArgumentException ("the need target can't be this element");
 		$this->need[] = $need;
 	}
 	/**
@@ -316,7 +392,7 @@ class Element{
 		}
 		if($this->hasNeed()){
 			$stringNeed = "";
-			foreach ($this->need as $need) {
+			foreach ($this->getNeed() as $need) {
 				if(strlen($stringNeed) > 0)
 					$stringNeed .= ", ";
 				$stringNeed .= $need->getTarget()->getName();
@@ -325,7 +401,7 @@ class Element{
 		}
 		if($this->hasAllowing()){
 			$stringAllow = "";
-			foreach ($this->allow as $allowing) {
+			foreach ($this->getAllow() as $allowing) {
 				if(strlen($stringAllow) > 0)
 					$stringAllow .= ", ";
 				$stringAllow .= $allowing->getTarget()->getName();
@@ -333,15 +409,26 @@ class Element{
 			$string .= " &emsp;Allow: [".$stringAllow."]<br>";
 		}
 		if($this->isExtending())
-			$string .= " &emsp;Extending: ".$this->extends->getName()."<br>";
+			$string .= " &emsp;Extending: ".$this->extend->getTarget()->getName()."<br>";
 		if($this->hasExtension()){
 			$stringExtension = "";
-			foreach ($this->extendedBy as $extension) {
+			foreach ($this->getExtension() as $extension) {
 				if(strlen($stringExtension) > 0)
 					$stringExtension .= ", ";
-				$stringExtension .= $extension->getName();
+				$stringExtension .= $extension->getTarget()->getName();
 			}
 			$string .= "&emsp;Extension: [".$stringExtension."]<br>";
+		}
+		if($this->isEvolveing())
+			$string .= " &emsp;Evolving from: ".$this->regress->getTarget()->getName()."<br>";
+		if($this->hasEvolution()){
+			$stringEvolution = "";
+			foreach ($this->getEvolve() as $evolution) {
+				if(strlen($stringEvolution) > 0)
+					$stringEvolution .= ", ";
+				$stringEvolution .= $evolution->getTarget()->getName();
+			}
+			$string .= "&emsp;Evolution: [".$stringEvolution."]<br>";
 		}
 		return $string;
 	}

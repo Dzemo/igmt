@@ -25,6 +25,8 @@
 	$space_x = 30;		//Horizontal space between Element
 	$space_y = 60;		//Vertical space between Element
 	$space_arrow = 3;	//Space between Element and start/end of arrows
+	$length_arrow = 3;	//Length of arrows
+	$width_arrow = 3;	//Width of arrows
 	$limit_time = 15; 		//Limit time for generation
 	$prefered_width = 1000;	//Prefered width of the image
 
@@ -60,6 +62,8 @@
 	echo "space_x= ".$space_x."px<br>";
 	echo "space_y= ".$space_y."px<br>";
 	echo "space_arrow= ".$space_arrow."px<br>";
+	echo "length_arrow= ".$length_arrow."px<br>";
+	echo "width_arrow= ".$width_arrow."px<br>";
 
 	//White background
 	$blanc = imagecolorallocate($image, 255, 255, 255);
@@ -93,20 +97,19 @@
 		$arrayShuffle = shuffleTree($original_tree);
 		$hash = $arrayShuffle['hash'];
 		if(!array_key_exists($hash, $hash_pool)){
-			echo " => testing<br>";
 			$hash_pool[$hash] = true;
 			$current_tree = $arrayShuffle['tree'];
 
 			//Calculating position of string and arrow for adjustement
 			$stringsElements = buildStringsElements($image, $arrayShuffle['tree'], $font_size, $font_file, $margin_x, $margin_y, $space_x, $space_y, $colors['categories']);
-			$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $colors['arrow']);
+			$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $width_arrow, $colors['arrow']);
 
 			//Count the number of intersection in the adjustement
 			$array_intersection = countArrowsIntersection($arrowsElements);
 			$count_intersect = $array_intersection['count_intersect'];
 			$count_potential_intersect = $array_intersection['count_potential_intersect'];
 			
-			echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect)<br>";
+			echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect) :<br>";
 
 			if($count_intersect < $min_intersect){
 
@@ -123,14 +126,11 @@
 				echo "This tree is not the tree you are looking for<br>";
 			}
 		}
-		else{
-			echo " => already tested<br>";
-		}
 
 	}while($min_intersect > 0 && time() - $start < $limit_time);
 
 	//Finallay, draw the chosen tree
-	drawElements($image, $print_candidate['strings'], $print_candidate['arrows'], $font_size, $font_file, $colors);
+	drawElements($image, $print_candidate['strings'], $print_candidate['arrows'], $font_size, $font_file, $length_arrow, $width_arrow, $space_arrow, $colors);
 
 	echo "<br>===== End of generation =====<br>";
 

@@ -64,8 +64,15 @@ class ElementDao extends Dao{
 						$arrayResultat[$link->getAllow()]->addNeed($innerLinks['need']);
 						$arrayResultat[$link->getNeed()]->addAllow($innerLinks['allow']);
 					}
-					if($link->getType() == Link::typeExtends){
-
+					else if($link->getType() == Link::typeExtend){
+						$innerLinks = $link->toInnerLink($arrayResultat);
+						$arrayResultat[$link->getAllow()]->addExtension($innerLinks['extendedby']);
+						$arrayResultat[$link->getNeed()]->setExtend($innerLinks['extend']);
+					}
+					else if($link->getType() == Link::typeEvolve){
+						$innerLinks = $link->toInnerLink($arrayResultat);
+						$arrayResultat[$link->getAllow()]->addEvolution($innerLinks['evolve']);
+						$arrayResultat[$link->getNeed()]->setRegress($innerLinks['regress']);
 					}
 				}
 				return $arrayResultat;

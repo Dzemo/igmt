@@ -13,14 +13,20 @@ class Link{
 	///////////////
 	/**
 	 * Constant for a link that represents a need relation :
-	 * need is allowing allow allow
+	 * need is allowing allow
 	 */
 	const typeRequire = "REQUIRE";
 	/**
-	 * Constant for a link that represents a extends relation :
+	 * Constant for a link that represents a extend relation :
 	 * need is extended by allow
 	 */
-	const typeExtends = "EXTENDS";
+	const typeExtend = "EXTEND";
+
+	/**
+	 * Constant for a link that represents a evovle relation :
+	 * need is evolving into allow
+	 */
+	const typeEvolve = "EVOLVE";
 	
 	///////////////
 	//ATTRIBUTS //
@@ -52,7 +58,7 @@ class Link{
 	private $conditions;
 	/**
 	 * The type of this link
-	 * Must be a not empty string in {typeRequire, typeExtends}
+	 * Must be a not empty string in {typeRequire, typeExtend}
 	 * @var string
 	 */
 	private $type;
@@ -64,7 +70,7 @@ class Link{
 	 * @param int  $id   	Must be a integer greater than 0 or null for new link
 	 * @param string $need 
 	 * @param string $allow   
-	 * @param string $type Must be a not empty string in {typeRequire, typeExtends}
+	 * @param string $type Must be a not empty string in {typeRequire, typeExtend}
 	 * @throws InvalidArgumentException
 	 */
 	public function __construct($id, $need, $allow, $type){
@@ -74,8 +80,8 @@ class Link{
 			throw new InvalidArgumentException ("need cannot be null");
 		else if($allow == null)
 			throw new InvalidArgumentException ("allow cannot be null");
-		else if($type == null || ($type != Link::typeExtends && $type != Link::typeRequire))
-			throw new InvalidArgumentException ("type must be ".Link::typeExtends." or ".Link::typeRequire);
+		else if($type == null || ($type != Link::typeExtend && $type != Link::typeRequire && $type != Link::typeEvolve))
+			throw new InvalidArgumentException ("type must be ".Link::typeExtend." or ".Link::typeRequire);
 		$this->id = $id;
 		$this->need = $need;
 		$this->allow = $allow;
@@ -153,12 +159,12 @@ class Link{
 		return $this->type ;
 	}
 	/**
-	 * @param string $type Must be a not empty string in {typeRequire, typeExtends}
+	 * @param string $type Must be a not empty string in {typeRequire, typeExtend}
 	 * @throws InvalidArgumentException
 	 */
 	public function setType($type){
-		if($type == null || ($type != Link::typeExtends && $type != Link::typeRequire))
-			throw new InvalidArgumentException ("type must be ".Link::typeExtends." or".Link::typeRequire);
+		if($type == null || ($type != Link::typeExtend && $type != Link::typeRequire))
+			throw new InvalidArgumentException ("type must be ".Link::typeExtend." or".Link::typeRequire);
 		
 		$this->type = $type ;
 	}
@@ -167,7 +173,11 @@ class Link{
 	//////////////
 	
 	/**
-	 * Transforme a REQUIRE link into an array containing the two 'allow' and 'need' InnerLink
+	 * Transforme a link into an array containing :
+	 *  the two 'allow' and 'need' InnerLink for REQUIRE link or
+	 *  the two 'extend' and 'extendedby' for EXTEND link or
+	 *  the two 'evolve' and 'regress' for EVOLVE link
+	 *  
 	 * @param  array $allElements all Elements
 	 * @return array
 	 */
@@ -178,13 +188,39 @@ class Link{
 			if($this->hasConditions())
 				$allow->setConditions($this->conditions);
 			$result['allow'] = $allow;
+
 			$need = new Need($this->id, $allElements[$this->need]);
 			if($this->hasConditions())
 				$need->setConditions($this->conditions);
 			$result['need'] = $need ;
 		}
+
+		else if($this->type == Link::typeExtend){
+			$extend = new Extend($this->id, $allElements[$this->allow]);
+			if($this->hasConditions())
+				$extend->setConditions($this->conditions);
+			$result['extend'] = $extend;
+
+			$extendedBy = new ExtendedBy($this->id, $allElements[$this->need]);
+			if($this->hasConditions())
+				$extendedBy->setConditions($this->conditions);
+			$result['extendedby'] = $extendedBy ;
+		}
+
+		else if($this->type == Link::typeEvolve){
+			$regress = new Regress($this->id, $allElements[$this->allow]);
+			if($this->hasConditions())
+				$regress->setConditions($this->conditions);
+			$result['regress'] = $regress ;
+
+			$evolve = new Evolve($this->id, $allElements[$this->need]);
+			if($this->hasConditions())
+				$evolve->setConditions($this->conditions);
+			$result['evolve'] = $evolve;
+		}
 		return $result;
 	}
+
 	/**
 	 * Determine wether this link has a condition
 	 * @return boolean

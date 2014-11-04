@@ -6,9 +6,9 @@
  */
 /**
  * Inner class of Element.
- * Allow link between an Element and the target Element.
+ * Regress link between an Element and the target Element.
  */
-class Allow extends InnerLink{
+class Regress extends InnerLink{
 	/////////////////
 	//CONSTRUCTOR //
 	/////////////////

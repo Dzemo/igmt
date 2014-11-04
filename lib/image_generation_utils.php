@@ -33,7 +33,7 @@
 
 			$shuffle_tree[$level] = $shuffle_tree_level;
 		}
-		echo "<br>Hash: $hash";
+		//echo "<br>Hash: $hash";
 		return array('hash' => md5($hash), 'tree' => $shuffle_tree);
 	}
 
@@ -77,21 +77,24 @@
 	 * @param  array $arrowsElements  
 	 * @param  int $font_size
 	 * @param  string $font_file
+	 * @param  int $length_arrow
+	 * @param  int $width_arrow
+	 * @param  int $space_arrow
 	 * @param  array $colors
 	 */
-	function drawElements($image, $stringsElements, $arrowsElements, $font_size, $font_file, $colors){
+	function drawElements($image, $stringsElements, $arrowsElements, $font_size, $font_file, $length_arrow, $width_arrow, $space_arrow, $colors){
 		echo "<br>===== Start Drawning =====<br>";
 
 		//Draw each arrows
 		foreach ($arrowsElements as $arrow) {
 			echo "Drawing ".$arrow['element_start']->getName()." -> ".$arrow['element_end']->getName()."<br>";
-			arrow($image, $arrow['start_x'], $arrow['start_y'], $arrow['end_x'], $arrow['end_y'], 3, 3, $arrow['color']);
+			arrow($image, $arrow['start_x'], $arrow['start_y'], $arrow['end_x'], $arrow['end_y'], $length_arrow, $width_arrow, $arrow['color']);
 		}
 
 		//Draw each string
 		foreach ($stringsElements as $string) {
 			echo "Drawning ".$string['element']->getName()." [".$string['x']." ; ".$string['y']."]<br>";
-			imagefilledrectangle ($image, $string['x'], $string['y'], $string['x']+$string['width'], $string['y']+$string['height']+1, $colors['background-alpha']);
+			imagefilledrectangle ($image, $string['x'], $string['y'], $string['x']+$string['width'], $string['y']+$string['height']+$space_arrow, $colors['background-alpha']);
 			imagettftext($image, $font_size, 0, $string['x'], $string['y']+$string['height'], $string['color'], $font_file, $string['element']->getName());
 		}
 	}
@@ -101,35 +104,45 @@
 	 * @param  resource 	$image           
 	 * @param  array 		$strings	Elements Array of all string to be print
 	 * @param  int 			$space_arrow Space between text and start/end of arrows
+	 * @param  int          $width_arrow Width of arrows
 	 * @param  resource 	$color           
 	 * @return array              		 Array with all the informations of the arrows ['start_x', 'start_y', 'end_x', 'end_y', 'color', 'element_start', 'element_end'] indexed by name of elements        
 	 */
-	function buildArrowsElements($image, $stringsElements, $space_arrow, $color){
+	function buildArrowsElements($image, $stringsElements, $space_arrow, $width_arrow, $color){
 		$arrowsElements = array();
 
 		foreach ($stringsElements as $name => $treeElem) {
 			$element = $treeElem['element'];
 
-			foreach ($element->getAllow() as $allow) {
-				$target = $allow->getTarget();
+			$innerLinks = array_merge($element->getNeed(), array($element->getRegress(), $element->getExtend()));
+			echo "<strong>".count($innerLinks).' links for element '.$element->getName()."</strong><br>";
+			$nbr_links = count($innerLinks);
 
-				$start_x = ($treeElem['x']+($treeElem['width'])/2);
-				$start_y = $treeElem['y'] + $treeElem['height'] + $space_arrow;
+			$arrow_width = $width_arrow * 3;
+			$link_index = 1;
+			foreach ($innerLinks as $link) {
+				if($link != null){
+					$target = $link->getTarget();					
 
-				$end_x = ($stringsElements[$target->getName()]['x']+($stringsElements[$target->getName()]['width'])/2);
-				$end_y = $stringsElements[$target->getName()]['y'] - $space_arrow;
+					$start_x = ($stringsElements[$target->getName()]['x']+($stringsElements[$target->getName()]['width'])/2 );
+					$start_y = $stringsElements[$target->getName()]['y'] + $stringsElements[$target->getName()]['height'] + $space_arrow;
 
-				$arrowsElements[] =  array(	
-						'start_x' 	=> $start_x,
-						'start_y'	=> $start_y,
-						'end_x'		=> $end_x,
-						'end_y'		=> $end_y,
-						'color'		=> $color,
-						'element_start' => $element,
-						'element_end'	=> $target
-					);
+					$end_x = ($treeElem['x']+($treeElem['width'])/2)  - (count($innerLinks)*$arrow_width/2) + ($link_index * $arrow_width);;
+					$end_y = $treeElem['y'] - $space_arrow;
 
-				echo "Arrow ".$element->getName()." -> ".$target->getName()."<br>";
+					$arrowsElements[] =  array(	
+							'start_x' 	=> $start_x,
+							'start_y'	=> $start_y,
+							'end_x'		=> $end_x,
+							'end_y'		=> $end_y,
+							'color'		=> $color,
+							'element_start' => $element,
+							'element_end'	=> $target
+						);
+
+					$link_index++;
+					//echo "Arrow ".$element->getName()." -> ".$target->getName()."<br>";
+				}
 			}
 		}
 
@@ -178,7 +191,7 @@
 						'color' => getColorForCategory($element->getCategory(), $colors)
 					);
 				
-				echo "String: ".$element->getName()." [".$treePrintedElements[$element->getName()]['x']." ; ".$treePrintedElements[$element->getName()]['y']."]<br>";
+				//echo "String: ".$element->getName()." [".$treePrintedElements[$element->getName()]['x']." ; ".$treePrintedElements[$element->getName()]['y']."]<br>";
 				$true_offset_x += $true_space_x + $width;
 			}
 			
@@ -231,24 +244,24 @@
 		$tree = array();
 
 		//Building the root (Element withou need)
-		$tree[0] = array();
 		$elements_left_in_array = count($elements);
-		foreach ($elements as $index => $element) {
-			if($element != null && count($element->getNeed()) == 0){
+		/*foreach ($elements as $index => $element) {
+			if($element != null && isLinkMatch($element, $tree)){
 				$tree[0][] = $element;
 				$elements[$index] = null;
 				$elements_left_in_array--;
 			}
-		}
+		}*/
 
 		//Building each level
-		$deep = 1;
+		//$tree[0] = array();
+		$deep = 0;
 		while($elements_left_in_array > 0){
 			$tree[$deep] = array();
 
 			foreach ($elements as $index => $element) {
 
-				if($element != null && isNeedMatch($element, $tree)){
+				if($element != null && isLinkMatch($element, $tree)){
 					$tree[$deep][] = $element;
 					$elements[$index] = null;
 					$elements_left_in_array--;
@@ -287,27 +300,35 @@
 	 * @param  array  $tree    
 	 * @return boolean          
 	 */
-	function isNeedMatch($element, $tree){
-		foreach ($element->getNeed() as $need) {
-			$find = false;
-			
-			//Looking only higher in the tree
-			$i = count($tree)-2;
-			while(!$find && $i >= 0){
-				foreach ($tree[$i] as $tree_elem) {
-					if($tree_elem->getName() == $need->getTarget()->getName()){
-						$i = null;
-						$find = true;
-						break;
+	function isLinkMatch($element, $tree){
+		//Array of Need, Extend and EvolveFrom as InnerLink
+		$arrayLink = array_merge($element->getNeed(), array($element->getExtend(), $element->getRegress()));
+		$stringLinks = "";
+		foreach ($arrayLink as $link) {
+			if($link != null){
+				$stringLinks .= " ".$link->getTarget()->getName();
+				$find = false;
+				
+				//Looking only higher in the tree
+				$i = count($tree)-2;
+				while(!$find && $i >= 0){
+					foreach ($tree[$i] as $tree_elem) {
+						if($tree_elem->getName() == $link->getTarget()->getName()){
+							$i = null;
+							$find = true;
+							break;
+						}
 					}
+					$i--;
 				}
-				$i--;
-			}
 
-			if(!$find){
-				return false;
+				if(!$find){
+					return false;
+				}
 			}
 		}
+
+		echo "All link match for ".$element->getName().":".(strlen($stringLinks) > 0 ? $stringLinks : " no link required")."<br>";
 
 		return true;
 	}

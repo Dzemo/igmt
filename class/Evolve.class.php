@@ -6,9 +6,9 @@
  */
 /**
  * Inner class of Element.
- * Allow link between an Element and the target Element.
+ * Evolve link between an Element and the target Element.
  */
-class Allow extends InnerLink{
+class Evolve extends InnerLink{
 	/////////////////
 	//CONSTRUCTOR //
 	/////////////////
