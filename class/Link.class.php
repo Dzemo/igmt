@@ -5,26 +5,26 @@
  * @version 1.0
  */
 /**
- * Class that represents a link between allow Element
+ * Class that represents a link between to Element
  */
 class Link{
 	///////////////
 	//CONSTANTS //
 	///////////////
 	/**
-	 * Constant for a link that represents a need relation :
-	 * need is allowing allow
+	 * Constant for a link that represents a from relation :
+	 * from is toing to
 	 */
 	const typeRequire = "REQUIRE";
 	/**
 	 * Constant for a link that represents a extend relation :
-	 * need is extended by allow
+	 * from is extended by to
 	 */
 	const typeExtend = "EXTEND";
 
 	/**
 	 * Constant for a link that represents a evovle relation :
-	 * need is evolving into allow
+	 * from is evolving into to
 	 */
 	const typeEvolve = "EVOLVE";
 	
@@ -41,17 +41,17 @@ class Link{
 	/**
 	 * Element name on the left side of this link
 	 * Not null
-	 * @var string
+	 * @var int
 	 */
-	private $need;
+	private $from;
 	/**
 	 * Element name on the right side of this link
 	 * Not null
-	 * @var string
+	 * @var int
 	 */
-	private $allow;
+	private $to;
 	/**
-	 * Optionnal conditions needed for this link
+	 * Optionnal conditions fromed for this link
 	 * The string may be empty
 	 * @var string
 	 */
@@ -66,25 +66,25 @@ class Link{
 	//CONSTRUCTEUR //
 	//////////////////
 	/**
-	 * Initialise a link with id, need and allow and a type. Conditions is set allow ""
+	 * Initialise a link with id, from and to and a type. Conditions is set to ""
 	 * @param int  $id   	Must be a integer greater than 0 or null for new link
-	 * @param string $need 
-	 * @param string $allow   
+	 * @param int $from 
+	 * @param int $to   
 	 * @param string $type Must be a not empty string in {typeRequire, typeExtend}
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($id, $need, $allow, $type){
+	public function __construct($id, $from, $to, $type){
 		if($id != null && (!is_int($id) || $id <= 0))
 			throw new InvalidArgumentException ("id must be an integer greater than 0 or null, input was: ".$id);
-		else if($need == null)
-			throw new InvalidArgumentException ("need cannot be null");
-		else if($allow == null)
-			throw new InvalidArgumentException ("allow cannot be null");
+		else if($from == null)
+			throw new InvalidArgumentException ("from cannot be null");
+		else if($to == null)
+			throw new InvalidArgumentException ("to cannot be null");
 		else if($type == null || ($type != Link::typeExtend && $type != Link::typeRequire && $type != Link::typeEvolve))
 			throw new InvalidArgumentException ("type must be ".Link::typeExtend." or ".Link::typeRequire);
 		$this->id = $id;
-		$this->need = $need;
-		$this->allow = $allow;
+		$this->from = $from;
+		$this->to = $to;
 		$this->conditions = "";
 		$this->type = $type;
 	}
@@ -108,36 +108,36 @@ class Link{
 		$this->id = $id ;
 	}
 	/**
-	 * @return string
+	 * @return int
 	 */
-	public function getNeed(){
-		return $this->need ;
+	public function getFrom(){
+		return $this->from ;
 	}
 	/**
-	 * @param string $need
+	 * @param int $from
 	 * @throws InvalidArgumentException
 	 */
-	public function setNeed($need){
-		if($need == null)
-			throw new InvalidArgumentException ("need can't be null");
+	public function setFrom($from){
+		if($from == null)
+			throw new InvalidArgumentException ("from can't be null");
 		
-		$this->need = $need ;
+		$this->from = $from ;
 	}
 	/**
-	 * @return string
+	 * @return int
 	 */
-	public function getAllow(){
-		return $this->allow ;
+	public function getTo(){
+		return $this->to ;
 	}
 	/**
-	 * @param string $allow
+	 * @param int $to
 	 * @throws InvalidArgumentException
 	 */
-	public function setAllow($allow){
-		if($allow == null)
-			throw new InvalidArgumentException ("allow can't be null");
+	public function setTo($to){
+		if($to == null)
+			throw new InvalidArgumentException ("to can't be null");
 		
-		$this->allow = $allow ;
+		$this->to = $to ;
 	}
 	/**
 	 * @return string
@@ -174,7 +174,7 @@ class Link{
 	
 	/**
 	 * Transforme a link into an array containing :
-	 *  the two 'allow' and 'need' InnerLink for REQUIRE link or
+	 *  the two 'to' and 'from' InnerLink for REQUIRE link or
 	 *  the two 'extend' and 'extendedby' for EXTEND link or
 	 *  the two 'evolve' and 'regress' for EVOLVE link
 	 *  
@@ -184,36 +184,36 @@ class Link{
 	public function toInnerLink($allElements){
 		$result = array();
 		if($this->type == Link::typeRequire){
-			$allow = new Allow($this->id, $allElements[$this->allow]);
+			$to = new Allow($this->id, $allElements[$this->to]);
 			if($this->hasConditions())
-				$allow->setConditions($this->conditions);
-			$result['allow'] = $allow;
+				$to->setConditions($this->conditions);
+			$result['allow'] = $to;
 
-			$need = new Need($this->id, $allElements[$this->need]);
+			$from = new Need($this->id, $allElements[$this->from]);
 			if($this->hasConditions())
-				$need->setConditions($this->conditions);
-			$result['need'] = $need ;
+				$from->setConditions($this->conditions);
+			$result['need'] = $from ;
 		}
 
 		else if($this->type == Link::typeExtend){
-			$extend = new Extend($this->id, $allElements[$this->allow]);
+			$extend = new Extend($this->id, $allElements[$this->to]);
 			if($this->hasConditions())
 				$extend->setConditions($this->conditions);
 			$result['extend'] = $extend;
 
-			$extendedBy = new ExtendedBy($this->id, $allElements[$this->need]);
+			$extendedBy = new ExtendedBy($this->id, $allElements[$this->from]);
 			if($this->hasConditions())
 				$extendedBy->setConditions($this->conditions);
 			$result['extendedby'] = $extendedBy ;
 		}
 
 		else if($this->type == Link::typeEvolve){
-			$regress = new Regress($this->id, $allElements[$this->allow]);
+			$regress = new Regress($this->id, $allElements[$this->to]);
 			if($this->hasConditions())
 				$regress->setConditions($this->conditions);
 			$result['regress'] = $regress ;
 
-			$evolve = new Evolve($this->id, $allElements[$this->need]);
+			$evolve = new Evolve($this->id, $allElements[$this->from]);
 			if($this->hasConditions())
 				$evolve->setConditions($this->conditions);
 			$result['evolve'] = $evolve;
@@ -234,9 +234,13 @@ class Link{
 	 * @return string 
 	 */
 	public function __toString(){
-		$string = "Link: id=".$this->id." Type: ".$this->type." need: ".$this->need->getName()." allow: ".$this->allow->getName();
+		$string = "Link: <br>";
+		$string.= "&emsp;Id=".$this->id."<br>";
+		$string.= "&emsp;From: ".$this->from."<br>";
+		$string.= "&emsp;To: ".$this->to."<br>";
+		$string.= "&emsp;Type: ".$this->type."<br>";
 		if(strlen($this->conditions) > 0 )
-			$string .= " Conditions: ".$this->conditions;
+			$string .= "&emsp;Conditions: ".$this->conditions;
 		return $string;
 	}
 }

@@ -12,6 +12,10 @@
 	$array = ElementDao::getAll();
 	foreach ($array as $elem) {
 		echo $elem."<br>";
+		/*echo "== Links == <br>";
+		foreach ($elem->getLinksArray() as $link) {
+			echo $link."<br>";
+		}*/
 	}
 
 

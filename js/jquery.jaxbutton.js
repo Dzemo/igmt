@@ -26,7 +26,7 @@
                 if(errorThrown) text+= ": "+errorThrown;
                 noty({text: text, type:'error'});
             },
-            //Must return an associative array
+            //If return null then the ajax request is not send
             getData: function(dataset){return {};},
 
         }, options);
@@ -51,21 +51,26 @@
 
                             settings.before(O.E.data());
 
-                            $.ajax({type: settings.method,
-                                    url: settings.url, 
-                                    data: settings.getData(O.E.data())
-                            }).always(function(){     
-                                //Switch back button content to text  
-                                O.is_loading = false;
-                                $(':first-child',O.E).show();
-                                $(':last-child',O.E).hide();
-                            })
-                            .done(function(data, textStatus, jqXHR){
-                                settings.done(O.E.data(), data, textStatus, jqXHR);
-                            })
-                            .fail(function(jqXHR, textStatus, errorThrown){
-                                settings.fail(O.E.data(), jqXHR, textStatus, errorThrown);
-                            });
+                            var data = settings.getData(O.E.data());
+
+                            if(data !== null){
+
+                                $.ajax({type: settings.method,
+                                        url: settings.url, 
+                                        data: data
+                                }).always(function(){     
+                                    //Switch back button content to text  
+                                    O.is_loading = false;
+                                    $(':first-child',O.E).show();
+                                    $(':last-child',O.E).hide();
+                                })
+                                .done(function(data, textStatus, jqXHR){
+                                    settings.done(O.E.data(), data, textStatus, jqXHR);
+                                })
+                                .fail(function(jqXHR, textStatus, errorThrown){
+                                    settings.fail(O.E.data(), jqXHR, textStatus, errorThrown);
+                                });
+                            }
                         }
                     });
                 },                

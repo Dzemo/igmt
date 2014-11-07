@@ -13,6 +13,12 @@ class Element{
 	// ATTRIBUTS //
 	////////////////
 	/**
+	 * Id of the element
+	 * Null for new element or greater than 0
+	 * @var int
+	 */
+	private $id;
+	/**
 	 * Name of this element.
 	 * Max length 40. Not null.
 	 * @var string
@@ -72,17 +78,23 @@ class Element{
 	/**
 	 * Initialise this Element description as emtpy string, tag, allow, need and extendedBy as empty array and extend as null
 	 *
-	 * @param string 	$name 		None empty string, max length 40
+	 * @param int 	$id
+	 * @param string $name None empty string, max length 40
 	 * @param Category    $category  Object category expected
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($name, Category $category){
-		if($name == null || !is_string($name) || strlen($name) == 0)
+	public function __construct($id, $name, Category $category){
+		
+		if($id != null && $id <= 0)
+			throw new InvalidArgumentException ("id can't be less than 1");
+		else if($name == null || !is_string($name) || strlen($name) == 0)
 			throw new InvalidArgumentException ("name must be a none empty string");
 		else if(strlen($name) > 40)
-			throw new InvalidArgumentException ("name length must be less than 40");
+			throw new InvalidArgumentException ("name length must be less thant 40");
 		else if($category == null)
 			throw new InvalidArgumentException ("category can't be empty");
+		
+		$this->id = $id;
 		$this->name = $name;
 		$this->category = $category;
 		$this->description = '';
@@ -97,6 +109,21 @@ class Element{
 	////////////////////////
 	// GETTER and SETTER //
 	////////////////////////
+	/**
+	 * @return int
+	 */
+	public function getId(){
+		return $this->id ;
+	}
+	/**
+	 * @param int $id
+	 * @throws InvalidArgumentException
+	 */
+	public function setId($id){
+		if($id <= 0)
+			throw new InvalidArgumentException ("id can't be less than 1");
+		$this->id = $id ;
+	}
 	/**
 	 * @return string
 	 */
@@ -196,7 +223,7 @@ class Element{
 	 * @throws InvalidArgumentException
 	 */
 	public function setExtend(Extend $extend){
-		if($extend == null || $extend->getTarget()->getName() == $this->name)
+		if($extend == null || $extend->getTarget()->getId() == $this->id)
 			throw new InvalidArgumentException ("The extend element can't be null or this element");
 
 		$this->extend = $extend ;
@@ -229,7 +256,7 @@ class Element{
 	 * @throws InvalidArgumentException
 	 */
 	public function setRegress(Regress $regress){
-		if($regress == null || $regress->getTarget()->getName() == $this->name)
+		if($regress == null || $regress->getTarget()->getId() == $this->id)
 			throw new InvalidArgumentException ("The regress element can't be null or this element");
 
 		$this->regress = $regress ;
@@ -250,6 +277,109 @@ class Element{
 	////////////////////
 	// OTHER METHODS //
 	////////////////////
+	
+	/**
+	 * Return all Link object corresponding with the InnerLink of this Element
+	 * @return array Array of Link indexed by link id
+	 */
+	public function getLinksArray(){
+
+		$links = array(); //Array of links
+
+		//Need
+		if($this->hasNeed()){
+			foreach ($this->need as $linkNeed) {
+				$link = new Link(
+								$linkNeed->getLinkId(), 
+								$linkNeed->getTarget()->getId(),
+								$this->id,
+								Link::typeRequire
+								);
+				if($linkNeed->hasConditions())
+					$link->setConditions($linkNeed->getConditions());
+
+				$links[] = $link;
+			}
+		}
+
+		//Allow
+		if($this->hasAllowing()){
+			foreach ($this->allow as $linkAllow) {
+				$link = new Link(
+								$linkAllow->getLinkId(), 
+								$this->id,
+								$linkAllow->getTarget()->getId(),
+								Link::typeRequire
+								);
+				if($linkAllow->hasConditions())
+					$link->setConditions($linkAllow->getConditions());
+
+				$links[] = $link;
+			}
+		}
+
+		//Extend
+		if($this->isExtending()){
+			$link = new Link(
+							$this->extend->getLinkId(), 
+							$this->id,
+							$this->extend->getTarget()->getId(),
+							Link::typeExtend
+							);
+			if($this->extend->hasConditions())
+				$link->setConditions($this->extend->getConditions());
+
+			$links[] = $link;
+		}
+
+		//ExtendedBy
+		if($this->hasExtension()){
+			foreach ($this->extendedBy as $linkExtendedBy) {
+				$link = new Link(
+								$linkExtendedBy->getLinkId(), 
+								$linkExtendedBy->getTarget()->getId(),
+								$this->id,
+								Link::typeExtend
+								);
+				if($linkExtendedBy->hasConditions())
+					$link->setConditions($linkExtendedBy->getConditions());
+
+				$links[] = $link;
+			}
+		}
+
+		//Regress
+		if($this->isEvolveing()){
+			$link = new Link(
+							$this->regress->getLinkId(), 
+							$this->id,
+							$this->regress->getTarget()->getId(),
+							Link::typeEvolve
+							);
+			if($this->regress->hasConditions())
+				$link->setConditions($this->regress->getConditions());
+
+			$links[] = $link;
+		}
+
+		//Evolve
+		if($this->hasEvolution()){
+			foreach ($this->evolve as $linkEvolve) {
+				$link = new Link(
+								$linkEvolve->getLinkId(), 
+								$linkEvolve->getTarget()->getId(),
+								$this->id,
+								Link::typeEvolve
+								);
+				if($linkEvolve->hasConditions())
+					$link->setConditions($linkEvolve->getConditions());
+
+				$links[] = $link;
+			}
+		}
+
+		return $links;
+	}
 	
 	/**
 	 * Return the name of this element without any space (to use in html identifier)
@@ -280,6 +410,21 @@ class Element{
 	public function hasTags(){
 		return count($this->tags) > 0;
 	}
+
+	/**
+	 * Return the tags separated by a ;
+	 * @return string 
+	 */
+	public function getTagsString(){
+		$stringTag = "";
+		foreach ($this->tags as $tag) {
+			if(strlen($stringTag) > 0)
+				$stringTag .= ";";
+			$stringTag .= $tag;
+		}
+
+		return $stringTag;
+	}
 	/**
 	 * Determine wether this Element extend another Element
 	 * @return boolean true if this element extend another Element, false otherwise
@@ -301,7 +446,7 @@ class Element{
 	 * @throws InvalidArgumentException
 	 */
 	public function addExtension(ExtendedBy $extension){
-		if($extension == null || $extension->getTarget()->getName() == $this->name)
+		if($extension == null || $extension->getTarget()->getId() == $this->id)
 			throw new InvalidArgumentException ("The extension element can't be null or this element");
 		$this->extendedBy[] = $extension;
 	}
@@ -320,7 +465,7 @@ class Element{
 	 * @throws InvalidArgumentException
 	 */
 	public function addEvolution(Evolve $evolution){
-		if($evolution == null || $evolution->getTarget()->getName() == $this->name)
+		if($evolution == null || $evolution->getTarget()->getId() == $this->id)
 			throw new InvalidArgumentException ("The evolve element can't be null or this element");
 		$this->evolve[] = $evolution;
 	}
@@ -340,7 +485,7 @@ class Element{
 	public function addAllow(Allow $allow){
 		if($allow == null)
 			throw new InvalidArgumentException ("allow can't be null");
-		else if($allow->getTarget()->getName() == $this->name)
+		else if($allow->getTarget()->getId() == $this->id)
 			throw new InvalidArgumentException ("the allow target can't be this element");
 		$this->allow[] = $allow;
 	}
@@ -359,7 +504,7 @@ class Element{
 	public function addNeed(Need $need){
 		if($need == null)
 			throw new InvalidArgumentException ("need can't be null");
-		else if($need->getTarget()->getName() == $this->name)
+		else if($need->getTarget()->getId() == $this->id)
 			throw new InvalidArgumentException ("the need target can't be this element");
 		$this->need[] = $need;
 	}
@@ -377,6 +522,7 @@ class Element{
 	 */
 	public function __toString(){
 		$string = "Element: <br>".
+						"&emsp;Id: ".$this->id."<br>".
 						"&emsp;Name: ".$this->name."<br>".
 						"&emsp;Category: ".$this->category."<br>";
 		if($this->hasDescription())
@@ -412,7 +558,7 @@ class Element{
 			$string .= " &emsp;Extending: ".$this->extend->getTarget()->getName()."<br>";
 		if($this->hasExtension()){
 			$stringExtension = "";
-			foreach ($this->getExtension() as $extension) {
+			foreach ($this->getExtendedBy() as $extension) {
 				if(strlen($stringExtension) > 0)
 					$stringExtension .= ", ";
 				$stringExtension .= $extension->getTarget()->getName();

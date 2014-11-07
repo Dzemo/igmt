@@ -9,7 +9,7 @@
 <div id="elements-tree">
 
 	<img 	id="image-tree"
-			src="<?php echo $tree_image_relative_path;?>" 
+			src="<?php echo $tree_image_relative_path."#".time();?>" 
 			alt="No image has been generated yet"
 			>
 	<br>	

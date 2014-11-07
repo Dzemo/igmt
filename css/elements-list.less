@@ -1,14 +1,13 @@
 /* Elements table */
 .elements-list-table{
   border-collapse: collapse;
-  width: 75%;
-  margin: 0 12.5% 5% 12.5%;
+  width: 95%;
+  margin: 0 2.5% 5% 2.5%;
   font-family: calibri;
   font-size: 120%;
 
   .elements-list-th, .elements-list-td{
-  	padding: 5px;
-  	border: 1px solid @midnight_blue;
+  	border: 3px solid @midnight_blue;
   }
 
   .elements-list-th{
@@ -23,40 +22,58 @@
 }
 
 .element-td{
-  div.name {
-    float: left;
-    margin: 0;
-    padding: 0 0 0 5px;
-
-    font-weight: bold;
+  padding: 0;
+  div.has-successors{
+    border-bottom: 1px solid @midnight_blue;
   }
 
-  div.tags{
-    float: right;
-    margin: 0;
-    padding: 0 5px 0 0;
+  div.has-predecessors{
+    border-top: 1px solid @midnight_blue;
   }
 
-  div.description {
-    clear: both;
-    margin: 0;
-    padding: 0 0 0 5px;
+  div.infos{
+    padding: 5px;
+    margin 0 -1px;
 
-    font-style: italic;
+    div.name {
+      float: left;
+      margin: 0;
+      padding: 0 0 0 5px;
+
+      font-weight: bold;
+    }
+
+    div.tags{
+      float: right;
+      margin: 0;
+      padding: 0 5px 0 0;
+    }
+
+    div.description {
+      clear: both;
+      margin: 0;
+      padding: 0 0 0 5px;
+      
+      span{
+        font-style: italic;
+      }
+    }
+  }
+
+  div.predecessors{
+    padding: 5px;
+
+  }
+
+  div.successors{
+    padding: 5px;
+
   }
 }
 
 .need-td, .allow-td{
   ul{
     list-style: circle;
-
-    .tooltip{
-      
-    }
-
-    .condition{
-      font-style: italic;
-    }
   }
 
   .buttons-td{
@@ -64,17 +81,30 @@
   }
 }
 
-/* Edit form */
-.modal-edit-element{
-  width: 40%;
+.condition{
+  font-style: italic;
 }
 
-.from-table-link{
+/* Edit form */
+.modal-edit-element{
+  width: 60%;
+}
+
+.form-content-link table{
   border-collapse: collapse;
 
   td{
     border: 1px solid @midnight_blue;
     padding: 2px;
     text-align: center;
+
+    textarea{
+      width: 100%;
+      height: 100%;
+
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+           box-sizing: border-box;
+    }
   }
 }
