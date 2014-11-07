@@ -18,7 +18,7 @@ class ElementDao extends Dao{
 	 * @return array
 	 */
 	public static function getAll(){
-		return self::getByQuery("SELECT * FROM igmt_element");
+		return self::getAllElements();
 	}
 
 	/**
@@ -27,8 +27,8 @@ class ElementDao extends Dao{
 	 * @return Element
 	 */
 	public static function getById($id){
-		$result = self::getByQuery("SELECT * FROM igmt_element WHERE id = ?", [$id]);
-		if($result != null && count($result) == 1)
+		$result = self::getAllElements();
+		if($result != null)
 			return $result[$id];
 		else
 			return null;
@@ -36,11 +36,18 @@ class ElementDao extends Dao{
 
 	/**
 	 * Return all element from a given category
-	 * @param  string $category 
+	 * @param  string $categoryName 
 	 * @return array
 	 */
-	public static function getByCategory($category){
-		return self::getByQuery("SELECT * FROM igmt_element WHERE category = ?",[$category]);
+	public static function getByCategory($categoryName){
+		$allElement = self::getAllElements();
+		$resultat = array();
+		foreach ($allElement as $element) {
+			if($element->getCategory()->getName() == $categoryName)
+				$resultat[$element->getId()] = $element;
+		}
+
+		return $resultat;
 	}
 
 	/**
@@ -66,7 +73,11 @@ class ElementDao extends Dao{
 			return null;
 	}
 
-
+	/**
+	 * Update an Element and his links
+	 * @param  Element $element 
+	 * @return Element           
+	 */
 	public static function update(Element $element){
 		$stmt = parent::getConnexion()->prepare("UPDATE igmt_element SET name = ?, category = ?, description = ?, tag = ? WHERE id = ?");
 		$result = $stmt->execute(array(
@@ -85,19 +96,29 @@ class ElementDao extends Dao{
 			return null;
 	}
 
+	/**
+	 * Delete an Element and his links
+	 * @param  Element $element 
+	 */
+	public static function delete(Element $element){
+		LinkDao::deleteFromElement($element);
+
+		$stmt = parent::getConnexion()->prepare("DELETE FROM igmt_element WHERE id = ?");
+		$stmt->execute(array($element->getId()));
+	}
+
 	/////////////
 	//PRIVATE //
 	/////////////
 
 	/**
-	 * Execute a query and return the result array as Element with link
-	 * @param  string $query 
-	 * @param  array $param 
+	 * Execute a query and return the result array with all Element as Element with link
 	 * @return array        
 	 */
-	private static function getByQuery($query, $param = null){
-			$stmt = parent::getConnexion()->prepare($query);
-			if($stmt->execute($param) && $stmt->rowCount() > 0){
+	private static function getAllElements(){
+			//If the result doesn't contain all Element there will be error when building links
+			$stmt = parent::getConnexion()->prepare("SELECT * FROM igmt_element");
+			if($stmt->execute() && $stmt->rowCount() > 0){
 				$arrayResultat = array();
 				$allCategories = CategoryDao::getAll();
 
@@ -142,7 +163,7 @@ class ElementDao extends Dao{
 				return $arrayResultat;
 			}
 			else{
-				return null;
+				return array();
 			}
 		}
 }

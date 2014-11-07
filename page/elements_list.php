@@ -217,8 +217,11 @@
 						<td class="elements-list-td buttons-td">
 							<!-- buttons -->
 							<button type="button" onclick="$('#edit-element-<?php echo $element->getId();?>').bPopup();">Edit</button><br>
-							<button type="button" onclick="">Delete</button>
-							<?php printModalEditElement($element, $categories, $allElements);?>
+							<button type="button" onclick="$('#delete-element-<?php echo $element->getId();?>').bPopup();">Delete</button>
+							<?php 
+								printModalEditElement($element, $categories, $allElements);
+								printModalDeleteElement($element);
+							?>
 						</td>
 					</tr>
 				<?php
@@ -231,67 +234,150 @@
 		printModalEditElement(null, $categories, $allElements);
 	?>
 </div>
+<div id="all-option-elements" style="display:none">
+	<?php echo getOptionElements($allElements, null, null);?>
+</div>
 <script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
-<script type="text/javascript">
-	$(function(){
-		elements_option_list = "<?php echo getOptionElements($allElements, null, null);?>";		
-
-		$('.sumo-select').SumoSelect();
-		$('.modal-edit-element .form-content').tabs({
-			heightStyle: 'auto',
-		});
-
-		$('.button-save').jaxButton({
-			url:"processing/ajax_edit_element.php", 
-			getData: function(dataset){
-				var form_id = dataset.formId;
-				var data = {
-								id: $('#'+form_id+'-input-id').val(),
-								name: $('#'+form_id+'-input-name').val(),
-								description: $('#'+form_id+'-textarea-description').val(),
-								category: $('#'+form_id+'-select-category').val(),
-								need: getDataForLinkTypeAndCardinal(form_id, 'need', 'many'),
-								allow: getDataForLinkTypeAndCardinal(form_id, 'allow', 'many'),
-								extend: getDataForLinkTypeAndCardinal(form_id, 'extend', 'one'),
-								extendedby: getDataForLinkTypeAndCardinal(form_id, 'extend', 'many'),
-								regress: getDataForLinkTypeAndCardinal(form_id, 'evolve', 'one'),
-								evolve: getDataForLinkTypeAndCardinal(form_id, 'evolve', 'many'),
-							};
-
-				console.log(data);
-				return data;
-			},
-			before: function(dataset){
-				noty({text: 'Saving element '+$('#'+dataset.formId+'-input-name').val(), type:'information'});
-				},
-			done: function(dataset, data, textStatus, jqXHR){
-				try{
-					var json = jQuery.parseJSON(data);
-					if(json.hasOwnProperty('errors')){
-						console.log(json.errors);
-						for(var i in json.errors){
-							noty({text: json.errors[i], type:'error'});
-						}
-					}
-					else{
-						if(json.hasOwnProperty('redirect')){
-							setTimeout(function(){
-								//document.location.href=json.redirect;
-							},750);
-						}
-						if(json.hasOwnProperty('message')){
-							noty({text: json.message, type:'success'});
-						}
-					}					
-				}catch(err){
-					noty({text: 'Error while parsing json response: '+err, type:'error'});
-				}
-			}
-		})
-	});
-</script>
 
 <?php
+
+	/**
+	 * Print a modal to confirm the deletion of an Elemement
+	 * @param  Element $e 
+	 */
+	function printModalDeleteElement(Element $e){
+		$form_id = "delete-element-".$e->getId();
+		?>
+			<form id="<?php echo $form_id;?>"
+				 class="modal modal-delete-element"
+				 >
+
+				<div class="form-title">
+					Delete element <?php echo "<span".$e->getCategory()->cssHTML().">".$e->getName()."</span>";?> ?
+				</div>
+
+				<div class="form-content">
+					<input 	
+						type="hidden"
+						id="<?php echo $form_id;?>-input-id"
+						name="<?php echo $form_id;?>-input-id"
+						value="<?php echo $e->getId();?>"
+						>
+						<input 
+							type="hidden"
+							id="<?php echo $form_id;?>-input-name"
+							name="element-name"
+							value="<?php echo $e->getName();?>"
+							/>
+					<table>
+						<tr>
+							<td>Category</td>
+							<td><?php echo $e->getCategory()->getName();?></td>
+						</tr>
+						<tr>
+							<td>Description</td>
+							<td><?php echo $e->getDescription();?></td>
+						</tr>
+						<?php 
+							if($e->hasNeed()){
+								$stringNeed = "[";
+								foreach ($e->getNeed() as $link) {
+									if($stringNeed != "[")
+										$stringNeed.= ", ";
+									$stringNeed.= "<span ".$link->getTarget()->getCategory()->cssHTML().">".$link->getTarget()->getName()."</span>";
+								}
+								$stringNeed .= "]";
+								?>
+									<tr>
+										<td>Need</td>
+										<td><?php echo $stringNeed;?></td>
+									</tr>
+								<?php
+							}
+						?>
+						<?php 
+							if($e->hasAllowing()){
+								$stringAllow = "[";
+								foreach ($e->getAllow() as $link) {
+									if($stringAllow != "[")
+										$stringAllow.= ", ";
+									$stringAllow.= "<span ".$link->getTarget()->getCategory()->cssHTML().">".$link->getTarget()->getName()."</span>";
+								}
+								$stringAllow .= "]";
+								?>
+									<tr>
+										<td>Allow</td>
+										<td><?php echo $stringAllow;?></td>
+									</tr>
+								<?php
+							}
+						?>
+						<?php 
+							if($e->isExtending()){						
+								$stringExtend = "[<span ".$e->getExtend()->getTarget()->getCategory()->cssHTML().">".$e->getExtend()->getTarget()->getName()."</span>]";
+								?>
+									<tr>
+										<td>Extend</td>
+										<td><?php echo $stringExtend;?></td>
+									</tr>
+								<?php
+							}
+						?>
+						<?php 
+							if($e->hasExtension()){
+								$stringExtendedBy = "[";
+								foreach ($e->getExtendedBy() as $link) {
+									if($stringExtendedBy != "[")
+										$stringExtendedBy.= ", ";
+									$stringExtendedBy.= "<span ".$link->getTarget()->getCategory()->cssHTML().">".$link->getTarget()->getName()."</span>";
+								}
+								$stringExtendedBy .= "]";
+								?>
+									<tr>
+										<td>Extended by</td>
+										<td><?php echo $stringExtendedBy;?></td>
+									</tr>
+								<?php
+							}
+						?>
+						<?php 
+							if($e->isEvolveing()){				
+								$stringRegress = "[<span ".$e->getRegress()->getTarget()->getCategory()->cssHTML().">".$e->getRegress()->getTarget()->getName()."</span>]";
+								?>
+									<tr>
+										<td>Evolve from</td>
+										<td><?php echo $stringRegress;?></td>
+									</tr>
+								<?php
+							}
+						?>
+						<?php 
+							if($e->hasEvolution()){
+								$stringEvolve = "[";
+								foreach ($e->getEvolve() as $link) {
+									if($stringEvolve != "[")
+										$stringEvolve.= ", ";
+									$stringEvolve.= "<span ".$link->getTarget()->getCategory()->cssHTML().">".$link->getTarget()->getName()."</span>";
+								}
+								$stringEvolve .= "]";
+								?>
+									<tr>
+										<td>Evolve into</td>
+										<td><?php echo $stringEvolve;?></td>
+									</tr>
+								<?php
+							}
+						?>
+					</table>
+				</div>
+
+				<div class="form-button">
+					<button type="button" data-form-id="<?php echo $form_id;?>" class="button-confirm button-delete-element">Delete</button>
+					<button type="button" class="button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
+				</div>
+			</form>
+		<?php
+	}
 
 	/**
 	 * Print a form for editing a specified element or creating a new element
@@ -457,8 +543,8 @@
 
 				</div>
 				<div class="form-button">
-					<button type="button" data-form-id="<?php echo $form_id;?>" class="button-save">Save</button>
-					<button type="button" class="button-cancel" onclick="$('#edit-element-<?php echo ($e ? $e->getId() : "new");?>').bPopup().close()">Cancel</button>
+					<button type="button" data-form-id="<?php echo $form_id;?>" class="button-confirm button-save-element">Save</button>
+					<button type="button" class="button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
 				</div>
 			</form>
 		<?php
@@ -564,7 +650,7 @@
 					?>
 					<tr>
 						<td class="button-td" colspan="3" <?php echo $style_button_tr;?>>
-							<button type="button" onclick="addTrLink('<?php echo $link_type;?>','<?php echo $form_id;?>', '<?php echo $cardinal;?>',window.elements_option_list)" >Add <?php echo $label;?></button>
+							<button type="button" onclick="addTrLink('<?php echo $link_type;?>','<?php echo $form_id;?>', '<?php echo $cardinal;?>')" >Add <?php echo $label;?></button>
 						</td>
 					</tr>
 				</tbody>

@@ -16,7 +16,7 @@ $(function(){
 				noty({text: "Image generated in "+json.time+"s after "+json.attempt_number+" attempts", type:'success'});
 
 				previous_src = $('#image-tree').attr('src');
-				$('#image-tree').attr('src',previous_src.split('#')[0]+'#'+new Date());
+				$('#image-tree').attr('src',previous_src.split('#')[0]+'#'+Date.now());
 
 			}catch(err){
 				noty({text: 'Error while parsing json response: '+err, type:'error'});

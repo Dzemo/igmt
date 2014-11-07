@@ -309,9 +309,7 @@
 		echo json_encode(array('errors' => $errors));
 	}
 	else{
-		if(!isset($_SESSION['noty'])) $_SESSION['noty'] = array();
-	
-
+		
 		if($element->getId() != null){
 			
 			ElementDao::update($element);

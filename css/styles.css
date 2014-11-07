@@ -95,8 +95,15 @@ table.form-table td.button-td {
   -webkit-font-smoothing: antialiased;
   -webkit-text-stroke: 1px rgba(0,0,0,0.1);
 }
-.form-content {
-  min-height: 500px;
+.form-subtitle {
+  text-align: center;
+  padding: 2px 5px;
+  font-size: 20px;
+  font-family: 'Calibri', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  text-shadow: 0px 1px 1px #95a5a6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.1);
 }
 div.form-button {
   text-align: center;
@@ -196,15 +203,21 @@ textarea:focus {
 .modal-edit-element {
   width: 60%;
 }
-.form-content-link table {
+.modal-edit-element .form-content {
+  min-height: 500px;
+}
+.modal-edit-element .form-subtitle {
+  margin-top: 2%;
+}
+.modal-edit-element .form-content-link table {
   border-collapse: collapse;
 }
-.form-content-link table td {
+.modal-edit-element .form-content-link table td {
   border: 1px solid #2c3e50;
   padding: 2px;
   text-align: center;
 }
-.form-content-link table td textarea {
+.modal-edit-element .form-content-link table td textarea {
   width: 100%;
   height: 100%;
   -webkit-box-sizing: border-box;

@@ -1,4 +1,106 @@
 /**
+ * Initialisation :
+ * -SumoSelect
+ * -Jquery-ui tabs for modal edit
+ * -jaxButton on save button for modal edit
+ */
+$(function(){
+
+	//SumoSelect 
+	$('.sumo-select').SumoSelect();
+
+	//Jquery-ui tabs for modal edit
+	$('.modal-edit-element .form-content').tabs();
+
+	//jaxButton on save button for modal edit
+	$('.button-save-element').jaxButton({
+		url:"processing/ajax_edit_element.php", 
+		getData: function(dataset){
+			var form_id = dataset.formId;
+			var data = {
+							id: $('#'+form_id+'-input-id').val(),
+							name: $('#'+form_id+'-input-name').val(),
+							description: $('#'+form_id+'-textarea-description').val(),
+							category: $('#'+form_id+'-select-category').val(),
+							need: getDataForLinkTypeAndCardinal(form_id, 'need', 'many'),
+							allow: getDataForLinkTypeAndCardinal(form_id, 'allow', 'many'),
+							extend: getDataForLinkTypeAndCardinal(form_id, 'extend', 'one'),
+							extendedby: getDataForLinkTypeAndCardinal(form_id, 'extend', 'many'),
+							regress: getDataForLinkTypeAndCardinal(form_id, 'evolve', 'one'),
+							evolve: getDataForLinkTypeAndCardinal(form_id, 'evolve', 'many'),
+						};
+			return data;
+		},
+		before: function(dataset){
+			noty({text: 'Saving element '+$('#'+dataset.formId+'-input-name').val(), type:'information'});
+			},
+		done: function(dataset, data, textStatus, jqXHR){
+			try{
+				var json = jQuery.parseJSON(data);
+				if(json.hasOwnProperty('errors')){
+					console.log(json.errors);
+					for(var i in json.errors){
+						noty({text: json.errors[i], type:'error'});
+					}
+				}
+				else{
+					if(json.hasOwnProperty('redirect')){
+						setTimeout(function(){
+							document.location.href=json.redirect;
+						},750);
+					}
+					if(json.hasOwnProperty('message')){
+						noty({text: json.message, type:'success'});
+					}
+				}					
+			}catch(err){
+				noty({text: 'Error while parsing json response: '+err, type:'error'});
+			}
+		}
+	});
+
+	//jaxButton on delete button for modal delete
+	$('.button-delete-element').jaxButton({
+		url:"processing/ajax_delete_element.php", 
+		getData: function(dataset){
+			var form_id = dataset.formId;
+			var data = {
+							id: $('#'+form_id+'-input-id').val(),	
+							name: $('#'+form_id+'-input-name').val()						
+						};
+			return data;
+		},
+		before: function(dataset){
+			noty({text: 'Deleting element '+$('#'+dataset.formId+'-input-name').val(), type:'information'});
+			},
+		done: function(dataset, data, textStatus, jqXHR){
+			try{
+				var json = jQuery.parseJSON(data);
+				if(json.hasOwnProperty('errors')){
+					console.log(json.errors);
+					for(var i in json.errors){
+						noty({text: json.errors[i], type:'error'});
+					}
+				}
+				else{
+					if(json.hasOwnProperty('redirect')){
+						setTimeout(function(){
+							document.location.href=json.redirect;
+						},750);
+					}
+					if(json.hasOwnProperty('message')){
+						noty({text: json.message, type:'success'});
+					}
+				}					
+			}catch(err){
+				noty({text: 'Error while parsing json response: '+err, type:'error'});
+			}
+		}
+	});
+
+});
+
+/**
  * Retrive post data for a link type
  * @param  {string} form_id   
  * @param  {string} link_type 
@@ -31,9 +133,8 @@ function getDataForLinkTypeAndCardinal(form_id, link_type, cardinal){
  * @param  {string} link_type                  need|allow|extend|evolve
  * @param  {string} form_id               
  * @param  {string} cardinal                   many|one
- * @param  {string} options_elements_list 
  */
-function addTrLink(link_type, form_id, cardinal, options_elements_list){
+function addTrLink(link_type, form_id, cardinal){
 
 	var index = 0;
 	$('#'+form_id+'-'+link_type+' table tbody tr').each(function(){
@@ -70,6 +171,8 @@ function addTrLink(link_type, form_id, cardinal, options_elements_list){
 	templateTd+= '		Remove</button>';
 	templateTd+= '	</td>';
 	templateTd+= '</tr>';
+
+	options_elements_list = $('#all-option-elements').html();
 
 	templateTd = templateTd.replace(new RegExp('\{\{index\}\}', 'g'), index);
 	templateTd = templateTd.replace(new RegExp('\{\{form_id\}\}', 'g'), form_id);
