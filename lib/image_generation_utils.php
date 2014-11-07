@@ -105,21 +105,36 @@
 	 * @param  array 		$strings	Elements Array of all string to be print
 	 * @param  int 			$space_arrow Space between text and start/end of arrows
 	 * @param  int          $width_arrow Width of arrows
+	 * @param  boolean		$space_between_end If there should be a space between arrow end
 	 * @param  resource 	$color           
 	 * @return array              		 Array with all the informations of the arrows ['start_x', 'start_y', 'end_x', 'end_y', 'color', 'element_start', 'element_end'] indexed by name of elements        
 	 */
-	function buildArrowsElements($image, $stringsElements, $space_arrow, $width_arrow, $color){
+	function buildArrowsElements($image, $stringsElements, $space_arrow, $width_arrow, $space_between_end, $color){
 		$arrowsElements = array();
 
 		foreach ($stringsElements as $name => $treeElem) {
 			$element = $treeElem['element'];
 
 			$innerLinks = array_merge($element->getNeed(), array($element->getRegress(), $element->getExtend()));
-			echo "<strong>".count($innerLinks).' links for element '.$element->getName()."</strong><br>";
 			$nbr_links = count($innerLinks);
 
 			$arrow_width = $width_arrow * 3;
 			$link_index = 1;
+
+			if($space_between_end){
+				//If there is space between arrow end, sort the link in order to avoid intersection
+				
+				usort($innerLinks, function($a, $b) use ($stringsElements) {
+								if($a == null && $b == null) return 0;
+								else if($a == null) return -1;
+								else if($b == null) return 1;
+						        
+						        $start_a = ($stringsElements[$a->getTarget()->getName()]['x']+($stringsElements[$a->getTarget()->getName()]['width'])/2 );
+								$start_b = ($stringsElements[$b->getTarget()->getName()]['x']+($stringsElements[$b->getTarget()->getName()]['width'])/2 );
+								return $start_a - $start_b;
+						    });
+			}
+
 			foreach ($innerLinks as $link) {
 				if($link != null){
 					$target = $link->getTarget();					
@@ -127,7 +142,9 @@
 					$start_x = ($stringsElements[$target->getName()]['x']+($stringsElements[$target->getName()]['width'])/2 );
 					$start_y = $stringsElements[$target->getName()]['y'] + $stringsElements[$target->getName()]['height'] + $space_arrow;
 
-					$end_x = ($treeElem['x']+($treeElem['width'])/2)  - (count($innerLinks)*$arrow_width/2) + ($link_index * $arrow_width);;
+					$end_x = ($treeElem['x']+($treeElem['width'])/2);
+					if($space_between_end)
+					  $end_x = $end_x- (count($innerLinks)*$arrow_width/2) + ($link_index * $arrow_width);
 					$end_y = $treeElem['y'] - $space_arrow;
 
 					$arrowsElements[] =  array(	

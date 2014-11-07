@@ -92,6 +92,7 @@
 	$hash_pool = array();//Pool of trees resulting of a shuffle of the original_tree
 	$min_intersect = 10000000;
 	$print_candidate = array("strings" => array(), "arrows" => array());
+	$attempt_number = 0;
 	do{
 		//Shuffle the tree to try a new adjustement of the tree
 		$arrayShuffle = shuffleTree($original_tree);
@@ -102,14 +103,14 @@
 
 			//Calculating position of string and arrow for adjustement
 			$stringsElements = buildStringsElements($image, $arrayShuffle['tree'], $font_size, $font_file, $margin_x, $margin_y, $space_x, $space_y, $colors['categories']);
-			$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $width_arrow, $colors['arrow']);
+			$arrowsElements = buildArrowsElements($image, $stringsElements, $space_arrow, $width_arrow, false, $colors['arrow']);
 
 			//Count the number of intersection in the adjustement
 			$array_intersection = countArrowsIntersection($arrowsElements);
 			$count_intersect = $array_intersection['count_intersect'];
 			$count_potential_intersect = $array_intersection['count_potential_intersect'];
 			
-			echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect) :<br>";
+			echo "$hash: $count_intersect intersection of $count_potential_intersect (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." % intersect) : ";
 
 			if($count_intersect < $min_intersect){
 
@@ -127,14 +128,16 @@
 			}
 		}
 
+		$attempt_number++;
 	}while($min_intersect > 0 && time() - $start < $limit_time);
 
 	//Finallay, draw the chosen tree
+	$print_candidate['arrows'] = $arrowsElements = buildArrowsElements($image, $print_candidate['strings'], $space_arrow, $width_arrow, true, $colors['arrow']);
 	drawElements($image, $print_candidate['strings'], $print_candidate['arrows'], $font_size, $font_file, $length_arrow, $width_arrow, $space_arrow, $colors);
 
 	echo "<br>===== End of generation =====<br>";
 
-	echo "Image generate in ".(time() - $start)." second: ".count($print_candidate['strings'])." elements, ".count($print_candidate['arrows'])." arrows and ".$count_intersect."/".$count_potential_intersect." intersection (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." %)<br>";
+	echo "Image generate in ".(time() - $start)." second after $attempt_number attempts: ".count($print_candidate['strings'])." elements, ".count($print_candidate['arrows'])." arrows and ".$count_intersect."/".$count_potential_intersect." intersection (".($count_potential_intersect > 0 ? $count_intersect*100/$count_potential_intersect : 0)." %)<br>";
 	
 	//Output image
 	imagepng($image, $tree_image_absolute_path);
@@ -144,6 +147,6 @@
 
 	file_put_contents($tree_generation_log_path, $output);
 
-	echo json_encode(array('time' => time() - $start, 'date' => tmspToDateLong(time()), 'output' => $output ));
+	echo json_encode(array('time' => time() - $start, 'date' => tmspToDateLong(time()), 'attempt_number' => $attempt_number, 'output' => $output ));
 ?>
 
