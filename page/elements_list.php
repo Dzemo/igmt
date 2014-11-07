@@ -1,6 +1,54 @@
+<?php	
+	$allElements = ElementDao::getAll();
+	$categories = CategoryDao::getAll();
+?>
+
 <div id="elements-list">
-	<button type="button" onclick="$('#edit-element-new').bPopup()">Add element</button>
-	<table class="elements-list-table">
+
+	<div id="elements-list-menu">
+		<div class="menu-item">
+			<label for="category-filter">Show</label>
+			<select
+				id="category-filter"
+				name="category-filter"
+				class="sumo-select"
+				>
+				<option value="all" selected="selected">All (<?php echo count($allElements);?>)</option>
+				<?php 
+					//count the number of element for each category
+					$categoryCount = array();
+					foreach ($allElements as $element) {
+						$categoryTrimedName = $element->getCategory()->trimedName();
+						if(array_key_exists($categoryTrimedName, $categoryCount)){
+							$categoryCount[$categoryTrimedName]++;
+						}
+						else{
+							$categoryCount[$categoryTrimedName]=1;
+						}
+					}
+
+					//echo option for each category
+					foreach ($categories as $category) {
+						$countCategory = 0;
+						if(array_key_exists($category->trimedName(), $categoryCount)){
+							$countCategory = $categoryCount[$category->trimedName()];
+						}
+
+						$option = "<option value='".$category->trimedName()."'";
+						$option.= " data-sumo-class='".$category->trimedName()."'";
+						$option .= ">".$category->getName()." (".$countCategory.")</option><br>";
+
+						echo $option;
+					}
+				?>
+			</select>
+		</div>
+		<div class="menu-item">
+			<button type="button" class="button button-add" onclick="$('#edit-element-new').bPopup()">Add element</button>
+		</div>
+	</div>
+
+	<table id="elements-list-table">
 		<thead>
 			<th class="elements-list-th need-th">Need</th>
 			<th class="elements-list-th element-th">Element</th>
@@ -9,98 +57,25 @@
 		</thead>
 		<tbody>
 			<?php
-				$allElements = ElementDao::getAll();
-				$categories = CategoryDao::getAll();
-
 				foreach ($allElements as $element_index => $element) {
 				?>
-					<tr class="element-tr" id="element-<?php echo $element->getId();?>">
-						<td class="elements-list-td need-td">
-							<!-- Need -->
+					<tr class="element-tr category-<?php echo $element->getCategory()->trimedName();?>" id="element-<?php echo $element->getId();?>">
+						
+						<td class="elements-list-td from-td">
 							<ul>
 								<?php
-									foreach ($element->getNeed() as $need_index => $need) {
-										$target = $need->getTarget();
-									?>
-										<li id="<?php echo "element-".$element->getId()."-need-".$target->getId();?>"											
-											>
-											<a 	href="#element-<?php echo $target->getId();?>"
-												class="toolip"												
-												>
-												<span <?php echo $target->getCategory()->cssHTML();?>>
-													<?php echo $target->getName();?>
-												</span>
-											</a>
-											<?php
-												if($need->hasConditions())
-												{
-													?>
-														<br><span class="condition"><?php echo $need->getConditions();?></span>
-													<?php
-												}
-											?>
-										</li>
-									<?php
-									}
+									printInnerLinks($element, $element->getNeed(), "Need");
+									printInnerLinks($element, array($element->getExtend()), "Extend");
+									printInnerLinks($element, array($element->getRegress()), "Evolve from");	
 								?>
 							</ul>
 						</td>
 
 						<td class="elements-list-td element-td">
 							<!-- Element -->
-							<?php 
-								$has_predecessors = $element->isEvolveing() || $element->isExtending() ? "has-predecessors" : "";
-								$has_successors = $element->hasEvolution() || $element->hasExtension() ? "has-successors" : "";
-							?>
-
-							<!-- Predecessors : evolve from (regress) and extend -->
-							<div class="predecessors">
-								<?php
-									//Evole from (regress)
-									if($element->isEvolveing()){
-										?>
-											<div class="regress">
-												Evolve from : <a href="#element-<?php echo $element->getRegress()->getTarget()->getId();?>"											
-													>
-													<span <?php echo  $element->getRegress()->getTarget()->getCategory()->cssHTML();?>>
-														<?php echo  $element->getRegress()->getTarget()->getName();?>
-													</span>													
-												</a>
-												<?php
-													if($element->getRegress()->hasConditions()){
-														?>
-															(<span class="condition"><?php echo $element->getRegress()->getConditions();?></span>)
-														<?php
-													}
-												?>
-											</div>
-										<?php
-									}
-									//Extend
-									if($element->isExtending()){
-										?>
-											<div class="extend">
-												Extends : <a href="#element-<?php echo $element->getExtend()->getTarget()->getId();?>"											
-													>
-													<span <?php echo  $element->getExtend()->getTarget()->getCategory()->cssHTML();?>>
-														<?php echo  $element->getExtend()->getTarget()->getName();?>
-													</span>													
-												</a>
-												<?php
-													if($element->getExtend()->hasConditions()){
-														?>
-															(<span class="condition"><?php echo $element->getExtend()->getConditions();?></span>)
-														<?php
-													}
-												?>
-											</div>
-										<?php
-									}
-								?>
-							</div>
 
 							<!-- Infos : Name, description, tags -->
-							<div class="infos <?php echo $has_predecessors." ".$has_successors;?>">
+							<div class="infos">
 								<div class="name">
 									Name: 
 									<span <?php echo $element->getCategory()->cssHTML();?>>
@@ -129,95 +104,22 @@
 									<span><?php echo $element->getDescription();?></span>
 								</div>
 							</div>
-
-							<!-- Successors : evolution and extension -->
-							<div class="successors">
-								<?php
-									//Evolve into
-									if($element->hasEvolution()){
-										$stringEvolve = "[";
-										foreach ($element->getEvolve() as $evolve) {
-											if($stringEvolve != "[") $stringEvolve .= ", ";
-
-											$stringEvolve .= " <a href=\"#element-".$evolve->getTarget()->getId()."\">";
-											$stringEvolve .= "		<span ".$evolve->getTarget()->getCategory()->cssHTML().">";
-											$stringEvolve .= $evolve->getTarget()->getName();
-											$stringEvolve .= " 		</span>";
-											$stringEvolve .= " 	</a>";
-
-											if($evolve->hasConditions()){
-												$stringEvolve .= "(<span class=\"condition\">".$evolve->getConditions()."</span>)";
-											}
-										}
-										$stringEvolve .= "]";
-										?>
-											<div class="evolve">
-												Evolve into : <?php echo $stringEvolve;?>
-											</div>
-										<?php
-									}
-									//Extended by
-									if($element->hasExtension()){
-										$stringExtendedBy = "[";
-										foreach ($element->getExtendedBy() as $extendedBy) {
-											if($stringExtendedBy != "[") $stringEvolve .= ", ";
-
-											$stringExtendedBy .= "<a href=\"#element-".$extendedBy->getTarget()->getId()."\">";
-											$stringExtendedBy .= "<span ".$extendedBy->getTarget()->getCategory()->cssHTML().">";
-											$stringExtendedBy .= $extendedBy->getTarget()->getName();
-											$stringExtendedBy .= "</span>";
-											$stringExtendedBy .= "</a>";
-
-											if($extendedBy->hasConditions()){
-												$stringExtendedBy .= "(<span class=\"condition\">".$extendedBy->getConditions()."</span>)";
-											}
-										}
-										$stringExtendedBy .= "]";
-										?>
-											<div class="extendedby">
-												Extended by : <?php echo $stringExtendedBy;?>
-											</div>
-										<?php
-									}
-								?>
-							</div>
 						</td>
 
-						<td class="elements-list-td allow-td">
-							<!-- Allow -->
+						<td class="elements-list-td to-td">
 							<ul>
 								<?php
-									foreach ($element->getAllow() as $allow_index => $allow) {
-										$target = $allow->getTarget();
-									?>
-										<li id="<?php echo "element-".$element->getId()."allow-".$allow->getTarget()->getId();?>"
-											>
-											<a href="#element-<?php echo $target->getId();?>"
-												class="toolip"										
-												>
-												<span <?php echo $target->getCategory()->cssHTML();?>>
-													<?php echo $target->getName();?>
-												</span>									
-											</a>
-											<?php
-												if($allow->hasConditions())
-												{
-													?>
-														<br><span class="condition"><?php echo $allow->getConditions();?></span>
-													<?php
-												}
-											?>
-										</li>
-									<?php
-									}
+									printInnerLinks($element, $element->getAllow(), "Allow");
+									printInnerLinks($element, $element->getExtendedBy(), "Extended by");
+									printInnerLinks($element, $element->getEvolve(), "Evolve into");
 								?>
 							</ul>
 						</td>
 
 						<td class="elements-list-td buttons-td">
 							<!-- buttons -->
-							<button type="button" onclick="$('#edit-element-<?php echo $element->getId();?>').bPopup();">Edit</button><br>
-							<button type="button" onclick="$('#delete-element-<?php echo $element->getId();?>').bPopup();">Delete</button>
+							<button class="button button-edit" type="button" onclick="$('#edit-element-<?php echo $element->getId();?>').bPopup();">Edit</button><br>
+							<button class="button button-delete" type="button" onclick="$('#delete-element-<?php echo $element->getId();?>').bPopup();">Delete</button>
 							<?php 
 								printModalEditElement($element, $categories, $allElements);
 								printModalDeleteElement($element);
@@ -240,6 +142,39 @@
 <script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
 
 <?php
+	/**
+	 * Print specified link with label for an element
+	 * @param  Element $element    
+	 * @param  array  $innerLinks Array of Innerlink
+	 * @param  string  $label 
+	 */
+	function printInnerLinks(Element $element, $innerLinks, $label){
+		foreach ($innerLinks as $innerLink) {
+			if($innerLink){
+				$target = $innerLink->getTarget();
+				?>
+					<li id="<?php echo "element-".$element->getId()."allow-".$target->getId();?>"
+						><?php echo "$label: ";?>
+						<a href="#element-<?php echo $target->getId();?>"
+							class="toolip"										
+							>
+							<span <?php echo $target->getCategory()->cssHTML();?>>
+								<?php echo $target->getName();?>
+							</span>									
+						</a>
+						<?php
+							if($innerLink->hasConditions())
+							{
+								?>
+									<br><span class="condition"><?php echo $innerLink->getConditions();?></span>
+								<?php
+							}
+						?>
+					</li>
+				<?php
+			}
+		}
+	}
 
 	/**
 	 * Print a modal to confirm the deletion of an Elemement
@@ -372,8 +307,8 @@
 				</div>
 
 				<div class="form-button">
-					<button type="button" data-form-id="<?php echo $form_id;?>" class="button-confirm button-delete-element">Delete</button>
-					<button type="button" class="button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
+					<button type="button" data-form-id="<?php echo $form_id;?>" class="button button-confirm button-delete-element">Delete</button>
+					<button type="button" class="button button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
 				</div>
 			</form>
 		<?php
@@ -543,8 +478,8 @@
 
 				</div>
 				<div class="form-button">
-					<button type="button" data-form-id="<?php echo $form_id;?>" class="button-confirm button-save-element">Save</button>
-					<button type="button" class="button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
+					<button type="button" data-form-id="<?php echo $form_id;?>" class="button button-confirm button-save-element">Save</button>
+					<button type="button" class="button button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
 				</div>
 			</form>
 		<?php
@@ -634,6 +569,7 @@
 										</td>
 										<td class="link-remove">
 											<button type="button"
+													class="button button-remove"
 													onclick="removeTrLink('<?php echo $link_type;?>','<?php echo $form_id;?>', '<?php echo $cardinal;?>', <?php echo $index;?>);"
 													>
 											Remove</button>
@@ -650,7 +586,7 @@
 					?>
 					<tr>
 						<td class="button-td" colspan="3" <?php echo $style_button_tr;?>>
-							<button type="button" onclick="addTrLink('<?php echo $link_type;?>','<?php echo $form_id;?>', '<?php echo $cardinal;?>')" >Add <?php echo $label;?></button>
+							<button type="button" class="button button-add" onclick="addTrLink('<?php echo $link_type;?>','<?php echo $form_id;?>', '<?php echo $cardinal;?>')" >Add <?php echo $label;?></button>
 						</td>
 					</tr>
 				</tbody>

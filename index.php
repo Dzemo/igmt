@@ -35,7 +35,7 @@
 	<body>
 	<div id="wrapper">
 		<div id="header">
-			<span class="main-title">Incrementals Game Modeling Tool</span>
+			<div class="main-title"><h1><span>Incrementals Game Modeling Tool</span></h1></div>
 			<ul class="menu">
 				<li><a href="index.php?page=elements_list">Elements list</a></li>
 				<li><a href="index.php?page=elements_tree">Elements tree</a></li>

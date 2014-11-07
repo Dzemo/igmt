@@ -1,5 +1,15 @@
+/* Menu */
+#elements-list-menu{
+  margin: 2.5%;
+  text-align: center;
+
+  .menu-item{
+    padding: 0.5%;
+  }
+}
+
 /* Elements table */
-.elements-list-table{
+#elements-list-table{
   border-collapse: collapse;
   width: 95%;
   margin: 0 2.5% 5% 2.5%;
@@ -23,14 +33,7 @@
 
 .element-td{
   padding: 0;
-  div.has-successors{
-    border-bottom: 1px solid @midnight_blue;
-  }
-
-  div.has-predecessors{
-    border-top: 1px solid @midnight_blue;
-  }
-
+ 
   div.infos{
     padding: 5px;
     margin 0 -1px;
@@ -59,25 +62,19 @@
       }
     }
   }
-
-  div.predecessors{
-    padding: 5px;
-
-  }
-
-  div.successors{
-    padding: 5px;
-
-  }
 }
 
-.need-td, .allow-td{
+.from-td, .to-td{
   ul{
     list-style: circle;
-  }
+  }  
+}
 
-  .buttons-td{
-    text-align: center;
+.buttons-td{
+  text-align: center;
+  
+  button{
+    margin: 5px 0;
   }
 }
 
@@ -100,8 +97,6 @@
 
   .form-content-link table{
     border-collapse: collapse;
-
-    
 
     td{
       border: 1px solid @midnight_blue;

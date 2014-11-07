@@ -2,7 +2,9 @@
  * Initialisation :
  * -SumoSelect
  * -Jquery-ui tabs for modal edit
+ * -category-filter change handler
  * -jaxButton on save button for modal edit
+ * -jaxButton on delete button for modal delete
  */
 $(function(){
 
@@ -11,6 +13,19 @@ $(function(){
 
 	//Jquery-ui tabs for modal edit
 	$('.modal-edit-element .form-content').tabs();
+
+	//category-filter change handler
+	$('#category-filter').change(function(){
+		var selectedCategory = $(this).val();
+
+		if(selectedCategory == "all"){
+			$('.element-tr').show();
+		}
+		else{
+			$('.element-tr').hide();
+			$('.category-'+selectedCategory).show();
+		}
+	});
 
 	//jaxButton on save button for modal edit
 	$('.button-save-element').jaxButton({

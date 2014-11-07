@@ -2,8 +2,12 @@
 /* Définition des couleurs flatuicolors.com */
 /* Définition des couleurs du jeu */
 /* Css Général */
-/* Concerne le footer */
+/* Header */
+/*Footer */
 /* Les modaux */
+/* GENERAL */
+/* SPECIFIC */
+/* Menu */
 /* Elements table */
 /* Edit form */
 .Test {
@@ -27,6 +31,42 @@ body {
 #footer {
   height: 3em;
   clear: both;
+}
+#header .main-title {
+  text-align: center;
+  padding: 2.5%;
+}
+#header .main-title h1 {
+  color: #2c3e50;
+  font-size: 40px;
+  font-family: 'Calibri', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  text-shadow: 0px 1px 1px #95a5a6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.1);
+}
+#header .main-title h1 span {
+  border-top: 1px solid #2c3e50;
+  border-bottom: 1px solid #2c3e50;
+}
+#header .menu {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-align: center;
+}
+#header .menu li {
+  display: inline;
+}
+#header .menu li a {
+  text-decoration: none;
+  padding: .2em 1em;
+  color: white;
+  background-color: #2c3e50;
+}
+#header .menu li a:hover {
+  color: white;
+  background-color: #34495e;
 }
 #footer {
   text-align: center;
@@ -133,33 +173,73 @@ input:disabled,
 textarea:focus {
   background: none;
 }
-.elements-list-table {
+.button {
+  border: 1px solid #cccccc;
+  background-color: #e0d8d8;
+  color: #2c3e50;
+  padding: 7px;
+  display: inline-block;
+  font-size: 14px;
+  text-decoration: none;
+  font-family: 'Calibri', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  text-shadow: 0px 1px 0 #ffffff;
+}
+.button:hover {
+  border: 1px solid #cccccc;
+  background-color: #f1f1f1;
+}
+.button-confirm:hover {
+  background-color: #52BE80;
+}
+.button-cancel:hover {
+  background-color: #CD6155;
+}
+.button-add:hover {
+  background-color: #F5B041;
+}
+.button-remove:hover {
+  background-color: #CD6155;
+}
+.button-delete:hover {
+  background-color: #CD6155;
+}
+.button-edit:hover {
+  background-color: #5499C7;
+}
+.button-generate:hover {
+  background-color: #5499C7;
+}
+.button-show:hover {
+  background-color: #F5B041;
+}
+#elements-list-menu {
+  margin: 2.5%;
+  text-align: center;
+}
+#elements-list-menu .menu-item {
+  padding: 0.5%;
+}
+#elements-list-table {
   border-collapse: collapse;
   width: 95%;
   margin: 0 2.5% 5% 2.5%;
   font-family: calibri;
   font-size: 120%;
 }
-.elements-list-table .elements-list-th,
-.elements-list-table .elements-list-td {
+#elements-list-table .elements-list-th,
+#elements-list-table .elements-list-td {
   border: 3px solid #2c3e50;
 }
-.elements-list-table .elements-list-th {
+#elements-list-table .elements-list-th {
   background-color: #2c3e50;
   color: white;
 }
-.elements-list-table .elements-list-td {
+#elements-list-table .elements-list-td {
   background-color: none;
   color: #2c3e50;
 }
 .element-td {
   padding: 0;
-}
-.element-td div.has-successors {
-  border-bottom: 1px solid #2c3e50;
-}
-.element-td div.has-predecessors {
-  border-top: 1px solid #2c3e50;
 }
 .element-td div.infos {
   padding: 5px;
@@ -183,19 +263,15 @@ textarea:focus {
 .element-td div.infos div.description span {
   font-style: italic;
 }
-.element-td div.predecessors {
-  padding: 5px;
-}
-.element-td div.successors {
-  padding: 5px;
-}
-.need-td ul,
-.allow-td ul {
+.from-td ul,
+.to-td ul {
   list-style: circle;
 }
-.need-td .buttons-td,
-.allow-td .buttons-td {
+.buttons-td {
   text-align: center;
+}
+.buttons-td button {
+  margin: 5px 0;
 }
 .condition {
   font-style: italic;

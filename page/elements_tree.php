@@ -23,9 +23,15 @@
 	<br>
 	<br>
 
-	<button type="button" id="button-generate">Generate</button>
-	<button id="button-toggle-generation-log"
-			type="button" 
+	<button type="button" 
+			id="button-generate"
+			class="button button-generate"
+			>
+			Generate
+	</button>
+	<button type="button" 
+			id="button-toggle-generation-log"
+			class="button button-show"
 			onclick="toggleGenerationLog()"
 			>
 			Show generation log
