@@ -6,6 +6,7 @@ $(function(){
 		url:"processing/ajax_generate_image_tree.php",
 		before: function(dataset){
 			noty({text: 'Starting tree generation, this may take a while', type:'information'});
+			return true;
 		} ,
 		done: function(dataset, data, textStatus, jqXHR){
 			try{
@@ -16,7 +17,7 @@ $(function(){
 				noty({text: "Image generated in "+json.time+"s after "+json.attempt_number+" attempts", type:'success'});
 
 				previous_src = $('#image-tree').attr('src');
-				$('#image-tree').attr('src',previous_src.split('#')[0]+'#'+Date.now());
+				$('#image-tree').attr('src',previous_src.split('?t=')[0]+'?t='+Date.now());
 
 			}catch(err){
 				noty({text: 'Error while parsing json response: '+err, type:'error'});

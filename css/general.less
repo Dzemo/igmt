@@ -34,8 +34,8 @@ html, body {
       -webkit-text-stroke: 1px rgba(0,0,0,0.1);
 
       span{
-        border-top: 1px solid @midnight_blue;
-        border-bottom:  1px solid @midnight_blue;
+        border-top: 2px solid @belize_hole;
+        border-bottom:  2px solid @belize_hole;
       }
     }
   }
@@ -47,14 +47,22 @@ html, body {
     text-align: center;
 
     li { 
-      display: inline; 
+      display: inline-block; 
+      margin: 0 5px;
      
       a{
         text-decoration: none;
-        padding: .2em 1em;
+        padding: 3px 16px;
         color: white;
         background-color: @midnight_blue;
       }
+
+      .current{
+        padding: 1px 16px;
+        border-top: 2px solid @belize_hole;
+        border-bottom: 2px solid @belize_hole;
+      }
+
       a:hover{
         color: white;
         background-color: @wet_asphalt;
@@ -80,22 +88,17 @@ html, body {
 
 a{
   text-decoration: none;
+  color: @belize_hole;
 }
 
-#footer, #header{
-  a{
-    text-decoration: none;
-    color: @belize_hole;
-  }
-
-  a:visited{
-    color: @amethyst;
-  }
-
-  a:hover{
-    text-decoration: underline;
-  }
+a:visited{
+  color: @amethyst;
 }
+
+a:hover{
+  text-decoration: underline;
+}
+
 
 /* Les modaux */
 .modal{

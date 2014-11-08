@@ -3,6 +3,7 @@
 	session_start();
 	
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."generate_css_category.php");
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."config.php");
 
 	//Array of errors
@@ -34,9 +35,13 @@
 	//Processing //
 	////////////////
 		
-	ElementDao::delete($id);
-	$message =  "Element ".$name." deleted!";
 
-	echo json_encode(array('redirect' => $GLOBALS['dns']."?page=elements_list", 'message' => $message));
+	CategoryDao::delete($id);
+	$message =  "Category ".$name." deleted!";
+
+	//regenerate css
+	generateCssCategory();
+	
+	echo json_encode(array('redirect' => $GLOBALS['dns']."?page=category_manager", 'message' => $message));
 	
 ?>

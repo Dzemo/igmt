@@ -18,8 +18,10 @@
             
             //To override
             url: '',
-            //data is the dataset of the button
-            before: function(dataset){},
+            //dataset contain the dataset of the target
+           
+            //Return boolean, false stop the request. Default : true.
+            before: function(dataset){return true;},
             done: function(dataset, data, textStatus, jqXHR){},
             fail: function(dataset, jqXHR, textStatus, errorThrown){
                 text = textStatus;
@@ -44,32 +46,33 @@
                     O.E.click(function (evt) {
                         if (!O.is_loading && settings.url.length > 0){
 
-                            //Changin button content to display loading image
-                            O.is_loading = true;
-                            $(':first-child',O.E).hide();
-                            $(':last-child',O.E).show();
+                            if(settings.before(O.E.data())){
 
-                            settings.before(O.E.data());
+                                var data = settings.getData(O.E.data());
 
-                            var data = settings.getData(O.E.data());
+                                if(data !== null){
+                                        
+                                    //Changin button content to display loading image
+                                    O.is_loading = true;
+                                    $(':first-child',O.E).hide();
+                                    $(':last-child',O.E).show();
 
-                            if(data !== null){
-
-                                $.ajax({type: settings.method,
-                                        url: settings.url, 
-                                        data: data
-                                }).always(function(){     
-                                    //Switch back button content to text  
-                                    O.is_loading = false;
-                                    $(':first-child',O.E).show();
-                                    $(':last-child',O.E).hide();
-                                })
-                                .done(function(data, textStatus, jqXHR){
-                                    settings.done(O.E.data(), data, textStatus, jqXHR);
-                                })
-                                .fail(function(jqXHR, textStatus, errorThrown){
-                                    settings.fail(O.E.data(), jqXHR, textStatus, errorThrown);
-                                });
+                                    $.ajax({type: settings.method,
+                                            url: settings.url, 
+                                            data: data
+                                    }).always(function(){     
+                                        //Switch back button content to text  
+                                        O.is_loading = false;
+                                        $(':first-child',O.E).show();
+                                        $(':last-child',O.E).hide();
+                                    })
+                                    .done(function(data, textStatus, jqXHR){
+                                        settings.done(O.E.data(), data, textStatus, jqXHR);
+                                    })
+                                    .fail(function(jqXHR, textStatus, errorThrown){
+                                        settings.fail(O.E.data(), jqXHR, textStatus, errorThrown);
+                                    });
+                                }
                             }
                         }
                     });

@@ -1,9 +1,10 @@
 <?php
-	session_start();
+	
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."lessmake.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."config.php");
 
-	require_once("lib/lessmake.php");
-	require_once("lib/classloader.php");
-	require_once("config.php");
+	$page = isset($_GET['page']) ? $_GET['page'] : 'elements_list';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!--
@@ -30,22 +31,32 @@
 		<script type="text/javascript" language="javascript" src="js/jquery.jaxbutton.js"></script>
 		<!-- CSS  -->
 		<link href="css/styles.css" rel="stylesheet" type="text/css" media="all" />
-		<link href="css/category.php" rel="stylesheet" type="text/css" media="all" />
+		<link href="css/category.css" rel="stylesheet" type="text/css" media="all" />
 	</head>
 	<body>
 	<div id="wrapper">
 		<div id="header">
 			<div class="main-title"><h1><span>Incrementals Game Modeling Tool</span></h1></div>
 			<ul class="menu">
-				<li><a href="index.php?page=elements_list">Elements list</a></li>
-				<li><a href="index.php?page=elements_tree">Elements tree</a></li>
-				<li><a href="index.php?page=TestElement">TestElement</a></li>
-				<li><a href="index.php?page=TestCategory">TestCategory</a></li>
+				<li>
+					<a href="index.php?page=elements_list" class="<?php echo ($page == 'elements_list' ? 'current' : ''); ?>">
+						Elements list
+					</a>
+				</li>
+				<li>
+					<a href="index.php?page=elements_tree" class="<?php echo ($page == 'elements_tree' ? 'current' : ''); ?>">
+						Elements tree
+					</a>
+				</li>
+				<li>
+					<a href="index.php?page=category_manager" class="<?php echo ($page == 'category_manager' ? 'current' : ''); ?>">
+						Category manager
+					</a>
+				</li>
 			</ul>
 		</div>
 		<div id="content">
 			<?php 
-				$page = isset($_GET['page']) ? $_GET['page'] : null;
 				switch($page){
 					case 'elements_list':
 						require_once("page/elements_list.php");
@@ -53,12 +64,9 @@
 					case 'elements_tree':
 						require_once("page/elements_tree.php");
 						break;
-					case 'TestElement':
-						require_once("test/TestElement.php");
-						break;
-					case 'TestCategory':
-						require_once("test/TestCategory.php");
-						break;						
+					case 'category_manager':
+						require_once("page/category_manager.php");
+						break;		
 					default:
 						require_once("page/elements_list.php");
 						break;				

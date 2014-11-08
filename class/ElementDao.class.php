@@ -1,7 +1,7 @@
 <?php
 /**
  * File about ElementDao class
- * @author Flavio Deroo
+ * @author Flavio Deroo and Raphaël Bideau
  * @package Dao
  */
 /**
@@ -57,15 +57,16 @@ class ElementDao extends Dao{
 	 * @return Element           
 	 */
 	public static function insert(Element $element){
-		$stmt = parent::getConnexion()->prepare("INSERT INTO igmt_element (name, category, description, tag) VALUES (?,?,?,?)");
+		$stmt = parent::getConnexion()->prepare("INSERT INTO igmt_element (name, category_id, description, tag) VALUES (?,?,?,?)");
 		$result = $stmt->execute(array(
 						$element->getName(),
-						$element->getCategory()->getName(),
+						$element->getCategory()->getId(),
 						$element->getDescription(),
 						$element->getTagsString()
 							));
 
 		if($result){
+			$element->setId(parent::getConnexion()->lastInsertId());
 			LinkDao::insertFromElement($element);
 			return $element;
 		}
@@ -79,10 +80,10 @@ class ElementDao extends Dao{
 	 * @return Element           
 	 */
 	public static function update(Element $element){
-		$stmt = parent::getConnexion()->prepare("UPDATE igmt_element SET name = ?, category = ?, description = ?, tag = ? WHERE id = ?");
+		$stmt = parent::getConnexion()->prepare("UPDATE igmt_element SET name = ?, category_id = ?, description = ?, tag = ? WHERE id = ?");
 		$result = $stmt->execute(array(
 						$element->getName(),
-						$element->getCategory()->getName(),
+						$element->getCategory()->getId(),
 						$element->getDescription(),
 						$element->getTagsString(),
 						$element->getId()
@@ -98,13 +99,13 @@ class ElementDao extends Dao{
 
 	/**
 	 * Delete an Element and his links
-	 * @param  Element $element 
+	 * @param  int $elementId 
 	 */
-	public static function delete(Element $element){
-		LinkDao::deleteFromElement($element);
+	public static function delete($elementId){
+		LinkDao::deleteFromElementId($elementId);
 
 		$stmt = parent::getConnexion()->prepare("DELETE FROM igmt_element WHERE id = ?");
-		$stmt->execute(array($element->getId()));
+		$stmt->execute(array($elementId));
 	}
 
 	/////////////
@@ -125,7 +126,7 @@ class ElementDao extends Dao{
 
 				while($row = $stmt->fetch(PDO::FETCH_ASSOC)){
 					//Info for each element
-					$element = new Element($row['id'], $row['name'], $allCategories[$row['category']]);	
+					$element = new Element($row['id'], $row['name'], $allCategories[$row['category_id']]);	
 					$element->setDescription($row['description']);
 					if(!empty($row['tag']))
 						$element->setTags(explode(';',$row['tag']));

@@ -1,6 +1,13 @@
 <?php	
 	$allElements = ElementDao::getAll();
 	$categories = CategoryDao::getAll();
+
+	if(isset($_GET['category_id']) && filter_var($_GET['category_id'], FILTER_VALIDATE_INT)){
+		$selectedCategory = intval($_GET['category_id']);
+	}
+	else{
+		$selectedCategory = -1;
+	}
 ?>
 
 <div id="elements-list">
@@ -13,29 +20,32 @@
 				name="category-filter"
 				class="sumo-select"
 				>
-				<option value="all" selected="selected">All (<?php echo count($allElements);?>)</option>
+				<option value="all" <?php if($selectedCategory == -1) echo "selected='selected'";?>>All (<?php echo count($allElements);?>)</option>
 				<?php 
 					//count the number of element for each category
 					$categoryCount = array();
 					foreach ($allElements as $element) {
-						$categoryTrimedName = $element->getCategory()->trimedName();
-						if(array_key_exists($categoryTrimedName, $categoryCount)){
-							$categoryCount[$categoryTrimedName]++;
+						$categoryId = $element->getCategory()->getId();
+						if(array_key_exists($categoryId, $categoryCount)){
+							$categoryCount[$categoryId]++;
 						}
 						else{
-							$categoryCount[$categoryTrimedName]=1;
+							$categoryCount[$categoryId]=1;
 						}
 					}
 
 					//echo option for each category
+
 					foreach ($categories as $category) {
 						$countCategory = 0;
-						if(array_key_exists($category->trimedName(), $categoryCount)){
-							$countCategory = $categoryCount[$category->trimedName()];
+						if(array_key_exists($category->getId(), $categoryCount)){
+							$countCategory = $categoryCount[$category->getId()];
 						}
 
-						$option = "<option value='".$category->trimedName()."'";
-						$option.= " data-sumo-class='".$category->trimedName()."'";
+						$option = "<option value='".$category->cssClassName()."'";
+						$option.= " data-sumo-class='".$category->cssClassName()."'";
+						if($selectedCategory == $category->getId()) 
+							$option.= "selected='selected'";
 						$option .= ">".$category->getName()." (".$countCategory.")</option><br>";
 
 						echo $option;
@@ -50,16 +60,16 @@
 
 	<table id="elements-list-table">
 		<thead>
-			<th class="elements-list-th need-th">Need</th>
+			<th class="elements-list-th need-th"></th>
 			<th class="elements-list-th element-th">Element</th>
-			<th class="elements-list-th allow-th">Allow</th>
+			<th class="elements-list-th allow-th"></th>
 			<th class="elements-list-th buttons-th"></th>
 		</thead>
 		<tbody>
 			<?php
 				foreach ($allElements as $element_index => $element) {
 				?>
-					<tr class="element-tr category-<?php echo $element->getCategory()->trimedName();?>" id="element-<?php echo $element->getId();?>">
+					<tr class="element-tr category-<?php echo $element->getCategory()->cssClassName();?>" id="element-<?php echo $element->getId();?>">
 						
 						<td class="elements-list-td from-td">
 							<ul>
@@ -204,7 +214,7 @@
 							name="element-name"
 							value="<?php echo $e->getName();?>"
 							/>
-					<table>
+					<table >
 						<tr>
 							<td>Category</td>
 							<td><?php echo $e->getCategory()->getName();?></td>
@@ -325,7 +335,6 @@
 		
 		//Id of the form, use for input identifier and tabs
 		$form_id = "edit-element-".($e ? $e->getId() : "new");
-		$inputs_id = ($e ? $e->getId() : "new");
 		?>
 			<form 	id="<?php echo $form_id;?>" 
 					class="modal modal-edit-element"
@@ -479,7 +488,7 @@
 				</div>
 				<div class="form-button">
 					<button type="button" data-form-id="<?php echo $form_id;?>" class="button button-confirm button-save-element">Save</button>
-					<button type="button" class="button button-cancel" onclick="$('#<?php echo $form_id;?>').bPopup().close()">Cancel</button>
+					<button type="button" class="button button-cancel" onclick="closeModalEditElement('<?php echo $form_id;?>')">Cancel</button>
 				</div>
 			</form>
 		<?php
@@ -604,7 +613,7 @@
 		$options = "";
 		foreach ($categories as $category) {
 			$option = "<option value='".$category->getName()."'";
-			$option.= " data-sumo-class='".$category->trimedName()."'";
+			$option.= " data-sumo-class='".$category->cssClassName()."'";
 
 			if($e && $e->getCategory() == $category){
 				$option .= " selected='selected'";
@@ -631,7 +640,7 @@
 			//If there is $e specified, don't output an option for him
 			if(!$e || $e != $element){
 				$option = "<option value='".$element->getId()."'";
-				$option.= " data-sumo-class='".$element->getCategory()->trimedName()."'";
+				$option.= " data-sumo-class='".$element->getCategory()->cssClassName()."'";
 
 				if($target && $target == $element){
 					$option .= " selected='selected'";

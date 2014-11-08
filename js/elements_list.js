@@ -14,7 +14,7 @@ $(function(){
 	//Jquery-ui tabs for modal edit
 	$('.modal-edit-element .form-content').tabs();
 
-	//category-filter change handler
+	//category-filter change handler and show selected category
 	$('#category-filter').change(function(){
 		var selectedCategory = $(this).val();
 
@@ -26,6 +26,14 @@ $(function(){
 			$('.category-'+selectedCategory).show();
 		}
 	});
+	var selectedCategory = $('#category-filter').val();
+	if(selectedCategory == "all"){
+		$('.element-tr').show();
+	}
+	else{
+		$('.element-tr').hide();
+		$('.category-'+selectedCategory).show();
+	}
 
 	//jaxButton on save button for modal edit
 	$('.button-save-element').jaxButton({
@@ -48,6 +56,7 @@ $(function(){
 		},
 		before: function(dataset){
 			noty({text: 'Saving element '+$('#'+dataset.formId+'-input-name').val(), type:'information'});
+			return true;
 			},
 		done: function(dataset, data, textStatus, jqXHR){
 			try{
@@ -87,6 +96,7 @@ $(function(){
 		},
 		before: function(dataset){
 			noty({text: 'Deleting element '+$('#'+dataset.formId+'-input-name').val(), type:'information'});
+			return true;
 			},
 		done: function(dataset, data, textStatus, jqXHR){
 			try{
@@ -158,7 +168,7 @@ function addTrLink(link_type, form_id, cardinal){
 	});
 	index++;
 
-	templateTd = '<tr class="link-tr link-tr-{{cardinal}}" data-index="{{index}}">';
+	templateTd = '<tr class="link-tr link-tr-tmp link-tr-{{cardinal}}" data-index="{{index}}">';
 	templateTd+= '	<td class="{{link_type}}-element">';
 	templateTd+= '		<input 	type="hidden"';
 	templateTd+= '			class="{{form_id}}-{{link_type}}-input-linkid"';
@@ -181,6 +191,7 @@ function addTrLink(link_type, form_id, cardinal){
 	templateTd+= '	</td>';
 	templateTd+= '	<td class="{{link_type}}-remove">';
 	templateTd+= '		<button type="button"';
+	templateTd+= '		        class="button button-remove"';
 	templateTd+= '				onclick="removeTrLink(\'{{link_type}}\',\'{{form_id}}\',\'{{cardinal}}\', {{index}});"';
 	templateTd+= '				>';
 	templateTd+= '		Remove</button>';
@@ -199,16 +210,53 @@ function addTrLink(link_type, form_id, cardinal){
 
 	$('#'+form_id+'-'+link_type+'-select-element-'+index+'-'+cardinal).SumoSelect();
 
-	//Updating link count
-	span = $('a[href="#'+form_id+'-'+link_type+'"] span.link-counter-'+cardinal+':last');
-	var counter = parseInt(span.html());
-	counter = isNaN(counter) ? 0 : counter + 1;
-	span.html(counter);
+	updateLinkCounter(form_id, link_type, cardinal);
+}
 
-	//if one cardinal and counter = 1 hide add
-	if(cardinal == 'one'){
-		$('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' td.button-td').parent().hide();
-	}
+/**
+ * Close the edit modal for the specified from
+ * @param  {string} form_id
+ */
+function closeModalEditElement(form_id){
+
+	//Delete new tr
+	$('.link-tr-tmp').remove()
+
+
+	//Updating link count
+	
+	//Need-many
+	link_type = 'need';
+	cardinal = 'many';
+	updateLinkCounter(form_id, link_type, cardinal)
+	
+	//Allow-many
+	link_type = 'allow';
+	cardinal = 'many';
+	updateLinkCounter(form_id, link_type, cardinal)
+	
+	//extend-one
+	link_type = 'extend';
+	cardinal = 'one';
+	updateLinkCounter(form_id, link_type, cardinal)
+	
+	//extend-many
+	link_type = 'extend';
+	cardinal = 'many';
+	updateLinkCounter(form_id, link_type, cardinal)
+	
+	//evolve-one
+	link_type = 'evolve';
+	cardinal = 'one';
+	updateLinkCounter(form_id, link_type, cardinal)
+	
+	//evolve-many
+	link_type = 'evolve';
+	cardinal = 'many';
+	updateLinkCounter(form_id, link_type, cardinal)
+
+	//Close modal
+	$('#'+form_id).bPopup().close();
 }
 
 /**
@@ -222,19 +270,25 @@ function removeTrLink(link_type, form_id, cardinal, index){
 	//Remove tr
 	$('#'+form_id+'-'+link_type+' .link-tr-'+cardinal+'[data-index='+index+']').remove();
 
-	//Updating link count
-	span = $('a[href="#'+form_id+'-'+link_type+'"] span.link-counter-'+cardinal+':last');
-	var counter = parseInt(span.html());
-	counter = isNaN(counter) ? 0 : counter - 1;
-	span.html(counter);
-
-	//if one cardinal and counter = 1 show add
-	if(cardinal == 'one'){
-		console.log('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' td.button-td');
-		$('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' td.button-td').parent().show();
-	}
+	updateLinkCounter(form_id, link_type, cardinal);
 }
 
 
+/**
+ * Update link counter for a specified form_id, link_type and cardinal. If
+ * cardinal is 'one', show/hide the add button according to counter
+ * @param  {string} form_id   
+ * @param  {string} link_type 
+ * @param  {string} cardinal 
+ */
+function updateLinkCounter(form_id, link_type, cardinal){
+	count = $('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' .link-tr').length;
+	$('a[href="#'+form_id+'-'+link_type+'"] span.link-counter-'+cardinal).html(count);
 
-
+	if(cardinal == 'one' && count == 1){
+		$('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' td.button-td').parent().hide();
+	}
+	else{
+		$('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' td.button-td').parent().show();
+	}
+}

@@ -1,6 +1,6 @@
 @import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
 /* Définition des couleurs flatuicolors.com */
-/* Définition des couleurs du jeu */
+/* Définition des class des couleurs flatuicolors.com pour le color picker*/
 /* Css Général */
 /* Header */
 /*Footer */
@@ -10,7 +10,66 @@
 /* Menu */
 /* Elements table */
 /* Edit form */
-.Test {
+/* Category table */
+/* Color picker*/
+.turquoise {
+  color: #1abc9c;
+}
+.emerald {
+  color: #2ecc71;
+}
+.green_sea {
+  color: #16a085;
+}
+.nephritis {
+  color: #27ae60;
+}
+.peter_river {
+  color: #3498db;
+}
+.belize_hole {
+  color: #2980b9;
+}
+.amethyst {
+  color: #9b59b6;
+}
+.wisteria {
+  color: #8e44ad;
+}
+.sun_flower {
+  color: #f1c40f;
+}
+.orange {
+  color: #f39c12;
+}
+.carrot {
+  color: #e67e22;
+}
+.pumpkin {
+  color: #d35400;
+}
+.alizarin {
+  color: #e74c3c;
+}
+.pomgranate {
+  color: #c0392b;
+}
+.wet_asphalt {
+  color: #34495e;
+}
+.midnight_blue {
+  color: #2c3e50;
+}
+.clouds {
+  color: #ecf0f1;
+}
+.silver {
+  color: #bdc3c7;
+}
+.concrete {
+  color: #95a5a6;
+}
+.asbestos {
   color: #7f8c8d;
 }
 html,
@@ -46,8 +105,8 @@ body {
   -webkit-text-stroke: 1px rgba(0,0,0,0.1);
 }
 #header .main-title h1 span {
-  border-top: 1px solid #2c3e50;
-  border-bottom: 1px solid #2c3e50;
+  border-top: 2px solid #2980b9;
+  border-bottom: 2px solid #2980b9;
 }
 #header .menu {
   margin: 0;
@@ -56,13 +115,19 @@ body {
   text-align: center;
 }
 #header .menu li {
-  display: inline;
+  display: inline-block;
+  margin: 0 5px;
 }
 #header .menu li a {
   text-decoration: none;
-  padding: .2em 1em;
+  padding: 3px 16px;
   color: white;
   background-color: #2c3e50;
+}
+#header .menu li .current {
+  padding: 1px 16px;
+  border-top: 2px solid #2980b9;
+  border-bottom: 2px solid #2980b9;
 }
 #header .menu li a:hover {
   color: white;
@@ -82,18 +147,12 @@ body {
 }
 a {
   text-decoration: none;
-}
-#footer a,
-#header a {
-  text-decoration: none;
   color: #2980b9;
 }
-#footer a:visited,
-#header a:visited {
+a:visited {
   color: #9b59b6;
 }
-#footer a:hover,
-#header a:hover {
+a:hover {
   text-decoration: underline;
 }
 .modal {
@@ -124,6 +183,9 @@ table.form-table td.label-td {
 }
 table.form-table td.button-td {
   text-align: center;
+}
+table.form-table td.space-td {
+  height: 20px;
 }
 .form-title {
   text-align: center;
@@ -206,10 +268,10 @@ textarea:focus {
 .button-edit:hover {
   background-color: #5499C7;
 }
-.button-generate:hover {
+.button-show:hover {
   background-color: #5499C7;
 }
-.button-show:hover {
+.button-generate:hover {
   background-color: #F5B041;
 }
 #elements-list-menu {
@@ -316,4 +378,66 @@ textarea:focus {
   font-family: 'Droid Sans Mono', 'Courier New';
   padding: 1%;
   margin: 0 10%;
+}
+#categories-list-menu {
+  margin: 2.5%;
+  text-align: center;
+}
+#categories-list-menu .menu-item {
+  padding: 0.5%;
+}
+#categories-list-table {
+  border-collapse: collapse;
+  width: 95%;
+  margin: 0 2.5% 5% 2.5%;
+  font-family: calibri;
+  font-size: 120%;
+  text-align: center;
+}
+#categories-list-table .categories-list-th,
+#categories-list-table .categories-list-td {
+  border: 3px solid #2c3e50;
+}
+#categories-list-table .categories-list-th {
+  background-color: #2c3e50;
+  color: white;
+}
+#categories-list-table .categories-list-td {
+  background-color: none;
+  color: #2c3e50;
+}
+.buttons-td {
+  text-align: center;
+}
+.buttons-td button {
+  margin: 5px 0;
+}
+.colorpicker-red,
+.colorpicker-green,
+.colorpicker-blue {
+  width: 300px;
+  margin: 15px;
+}
+.colorpicker-swatch {
+  width: 120px;
+  height: 100px;
+  background-image: none;
+}
+.colorpicker-red .ui-slider-range {
+  background: #ef2929;
+}
+.colorpicker-red .ui-slider-handle {
+  border-color: #ef2929;
+}
+.colorpicker-green .ui-slider-range {
+  background: #8ae234;
+}
+.colorpicker-green .ui-slider-handle {
+  border-color: #8ae234;
+}
+.colorpicker-blue .ui-slider-range {
+  background: #729fcf;
+}
+.colorpicker-blue .ui-slider-handle {
+  border-color: #729fcf;
 }

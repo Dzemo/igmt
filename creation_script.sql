@@ -2,22 +2,22 @@ DROP TABLE IF EXISTS igmt_element;
 CREATE TABLE igmt_element (
 	id MEDIUMINT NOT NULL AUTO_INCREMENT,
 	name varchar(40) NOT NULL,
-	category varchar(20) NOT NULL,
+	category_id MEDIUMINT NOT NULL,
 	description text,
 	tag text,
 	CONSTRAINT pk_igmt_element PRIMARY KEY (id),
-	CONSTRAINT un_ihmy_element UNIQUE (name),
-	CONSTRAINT fk_igmt_category FOREIGN KEY (name) REFERENCES igmt_category(name)
+	CONSTRAINT un_igmt_element UNIQUE (name),
+	CONSTRAINT fk_igmt_category FOREIGN KEY (name) REFERENCES igmt_category(id)
 );
 
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (1, 'Hut', 'Building', 'Increase maximum population by X', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (2, 'Cabine', 'Building', 'Increase maximum population by Y', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (3, 'Wood', 'Ressource', 'Ressource to build stuff', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (4, 'Workshop', 'Building', 'You can develop some usefull tools here', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (5, 'Apple fall', 'Event', 'An appel has fallan from a tree', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (6, 'Laboratory', 'Building', 'You can research some usefull tech here', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (7, 'Population Increase', 'Event', 'Increase maximum population every X seconds', '');
-INSERT INTO igmt_element (id, name, category, description, tag) VALUES (8, 'Population management unit', 'Building extension', 'Allow to do research about population management', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (1, 'Hut', 1, 'Increase maximum population by X', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (2, 'Cabine', 1, 'Increase maximum population by Y', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (3, 'Wood', 2, 'Ressource to build stuff', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (1, 'Workshop', 3, 'You can develop some usefull tools here', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (5, 'Apple fall', 4, 'An appel has fallan from a tree', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (6, 'Laboratory', 1, 'You can research some usefull tech here', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (7, 'Population Increase', 4, 'Increase maximum population every X seconds', '');
+INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (8, 'Population management unit', 5, 'Allow to do research about population management', '');
 
 
 
@@ -45,13 +45,16 @@ INSERT INTO igmt_link (from_id, to_id, type, conditions) VALUES (2, 1, 'EVOLVE',
 
 DROP TABLE IF EXISTS igmt_category;
 CREATE TABLE igmt_category (
+	id MEDIUMINT NOT NULL AUTO_INCREMENT,
 	name varchar(40) NOT NULL,
 	color varchar(7) NOT NULL,
-	CONSTRAINT pk_igmt_category PRIMARY KEY (name)
+	description TEXT,
+	CONSTRAINT un_igmt_category UNIQUE (name),
+	CONSTRAINT pk_igmt_category PRIMARY KEY (id)
 );
 
-INSERT INTO igmt_category (name, color) VALUES ('Building', '#2c3e50');
-INSERT INTO igmt_category (name, color) VALUES ('Ressource', '#27ae60');
-INSERT INTO igmt_category (name, color) VALUES ('Technology', '#2980b9');
-INSERT INTO igmt_category (name, color) VALUES ('Event', '#c0392b');
-INSERT INTO igmt_category (name, color) VALUES ('Building extension', '#34495e');
+INSERT INTO igmt_category (id, name, description, color) VALUES (1, 'Building', 'Element that can be build', '#2c3e50');
+INSERT INTO igmt_category (id, name, description, color) VALUES (2, 'Ressource', 'Element that can be gather', '#27ae60');
+INSERT INTO igmt_category (id, name, description, color) VALUES (3, 'Technology', 'Element that can be researched in the Laboratory and improve other element of the game', '#2980b9');
+INSERT INTO igmt_category (id, name, description, color) VALUES (4, 'Event', 'Element that can occur at random time', '#c0392b');
+INSERT INTO igmt_category (id, name, description, color) VALUES (5, 'Building extension', 'Element that can be build on another building', '#34495e');

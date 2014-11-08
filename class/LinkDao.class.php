@@ -109,26 +109,11 @@ class LinkDao extends Dao{
 
 	/**
 	 * Delete all links of an element
-	 * @param  Element $element
+	 * @param  int $elementId
 	 */
-	public static function deleteFromElement(Element $element){
-
-		$links = $element->getLinksArray();
-		
-		if(count($links) > 0){
-			$query = "DELETE FROM igmt_link WHERE";
-			$params = array();
-
-			foreach($links as $link){		
-				if($query != "DELETE FROM igmt_link WHERE")
-					$query .= "OR";
-				$query .= " id = ? ";	
-				$params[] = $link->getId();
-			}
-
-			$stmt = parent::getConnexion()->prepare($query);
-			$stmt->execute($params);
-		}
+	public static function deleteFromElementId($elementId){
+		$stmt = parent::getConnexion()->prepare("DELETE FROM igmt_link WHERE from_id = ? OR to_id = ?");
+		$stmt->execute(array($elementId, $elementId));
 	}
 
 	/////////////

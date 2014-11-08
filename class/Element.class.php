@@ -380,14 +380,6 @@ class Element{
 
 		return $links;
 	}
-	
-	/**
-	 * Return the name of this element without any space (to use in html identifier)
-	 * @return string
-	 */
-	public function trimedName(){
-		return preg_replace('/( *)/', '', $this->name);
-	}
 	/**
 	 * Determine wether this element has a description
 	 * @return boolean

@@ -8,10 +8,25 @@
  * Class that represents a Category of an Element. 
  */
 class Category{
+
+	/**
+	 * Brainstorming Tag :
+	 * -hasCost : cet éléments à un coût X d'un ou plusieurs autres élements pour être produit/construit/developper
+	 * -isProducer: cet éléments créer/produit une quantité X d'un ou plusieurs autres éléments à chaque tick
+	 * -hasSustainCost: cet éléments consome/detruit/utilise une quantité X d'un ou plusieurs autres éléments à chaque tick
+	 * 
+	 * -hisModifier: cette élément modifier de Y la quantité d'un tag hasCost, isProducer, hasSustainCost X
+	 */
 	
 	////////////////
 	// ATTRIBUTS //
 	////////////////
+	/**
+	 * Id of this Category
+	 * null for new category or greater than 0
+	 * @var int
+	 */
+	private $id;
 	/**
 	 * Name of this Category.
 	 * Max length 40. Not null.
@@ -25,6 +40,10 @@ class Category{
 	 * @var string
 	 */
 	private $color;
+	/**
+	 * @var string
+	 */
+	private $description;
 	
 	//////////////////
 	// CONSTRUCTOR //
@@ -36,8 +55,10 @@ class Category{
 	 * @param string    $color  hexadecimal code. max lenght 7
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct($name, $color){
-		if($name == null || !is_string($name) || strlen($name) == 0)
+	public function __construct($id, $name, $color){
+		if($id != null && $id <= 0)
+			throw new InvalidArgumentException ("id can't be less than 1");
+		else if($name == null || !is_string($name) || strlen($name) == 0)
 			throw new InvalidArgumentException ("name must be a none empty string");
 		else if(strlen($name) > 40)
 			throw new InvalidArgumentException ("name length must be less than 40");
@@ -45,12 +66,29 @@ class Category{
 			throw new InvalidArgumentException ("color can't be empty");
 		else if(strlen($color) > 7)
 			throw new InvalidArgumentException ("color lenght must be less than 7");
+		$this->id = $id;
 		$this->name = $name;
 		$this->color = $color;
+		$this->description = "";
 	}
 	////////////////////////
 	// GETTER and SETTER //
 	////////////////////////
+	/**
+	 * @return int
+	 */
+	public function getId(){
+		return $this->id ;
+	}
+	/**
+	 * @param int $id
+	 * @throws InvalidArgumentException
+	 */
+	public function setId($id){
+		if($id <= 0)
+			throw new InvalidArgumentException ("id can't be less than 1");
+		$this->id = $id ;
+	}
 	/**
 	 * @return string
 	 */
@@ -85,16 +123,31 @@ class Category{
 			throw new InvalidArgumentException ("color length must be less than 7");
 		$this->color = $color ;
 	}
+	/**
+	 * @return string
+	 */
+	public function getDescription(){
+		return $this->description ;
+	}
+	/**
+	 * @param string $description None empty string
+	 * @throws InvalidArgumentException
+	 */
+	public function setDescription($description){
+		if($description == null || !is_string($description))
+			throw new InvalidArgumentException ("description must be a none empty string");
+		$this->description = $description ;
+	}
 	////////////////////
 	// OTHER METHODS //
 	////////////////////
-	
+
 	/**
-	 * Return the name of this category without any space (to use in html identifier)
+	 * return the css class name of this category
 	 * @return string
 	 */
-	public function trimedName(){
-		return preg_replace('/( *)/', '', $this->name);
+	public function cssClassName(){
+		return $this->trimedName()."-".$this->id;
 	}
 
 	/**
@@ -102,7 +155,7 @@ class Category{
 	 * @return string
 	 */
 	public function cssHTML(){
-		return " class='".$this->trimedName()."' ";
+		return " class='".$this->cssClassName()."' ";
 	}
 
 	/**
@@ -110,9 +163,11 @@ class Category{
 	 * @return string 
 	 */
 	public function cssClass(){
-		echo ".".$this->trimedName()."{\n";
-		echo "   color:".$this->color."\n";
-		echo "}";
+		$cssClass = ".".$this->cssClassName()."{\n";
+		$cssClass.= "   color:".$this->color."\n";
+		$cssClass.= "}";
+
+		return $cssClass;
 	}
 	
 	/**
@@ -121,8 +176,20 @@ class Category{
 	 * @return string 
 	 */
 	public function __toString(){
-		$string = "Category: Name: ".$this->name." Color: ".$this->color;
+		$string = "Category: <br>".
+						"&emsp;Id: ".$this->id."<br>".
+						"&emsp;Name: ".$this->name."<br>".
+						"&emsp;Description: ".$this->description."<br>".
+						"&emsp;Color: <span style='color:".$this->color."'>".$this->color."</span><br>";
 		return $string;
+	}
+
+	/**
+	 * Return the name of this category without any space (to use in html identifier)
+	 * @return string
+	 */
+	private function trimedName(){
+		return preg_replace('/( *)/', '', $this->name);
 	}
 }
 ?>
