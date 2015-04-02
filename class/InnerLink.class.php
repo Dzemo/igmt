@@ -8,7 +8,7 @@
  * Abstract inner class of Element. Link between the Element and the target.
  * Extends by Need and Allow.
  */
-abstract class InnerLink{
+abstract class InnerLink implements JsonSerializable{
 	///////////////
 	//ATTRIBUTS //
 	///////////////
@@ -120,4 +120,17 @@ abstract class InnerLink{
 			$string .= " Conditions: ".$this->conditions;
 		return $string;
 	}
+        
+        
+    
+    /**
+     * Serialize cette class en un array acceptable par json_encode
+     * @return array 
+     */
+    public function jsonSerialize() {
+        return [
+          'condition' => $this->getConditions(),
+          'element' => $this->getTarget()->getName()
+        ];
+    }
 }

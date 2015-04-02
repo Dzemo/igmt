@@ -1,0 +1,24 @@
+<?php
+    	session_start();
+	
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
+	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."config.php");
+        
+        $modele = array();
+        
+        //Récupération des élément
+        $modele['element'] = ElementDao::getAll();
+        
+        //Récupération des categories
+        //$modele['category'] = CategoryDao::getAll();
+        
+        //Génération du Json
+        $json = json_encode($modele, JSON_PRETTY_PRINT);
+        
+         //Création du fichier JSON et écriture dans le fichier
+        $fileName = $modelePath."modele".date("_d_m_y__H_i_s").".json";
+        file_put_contents($fileName, $json);
+        
+        //En réponse on envoie le nom du fichier
+        echo $fileName;
+?>

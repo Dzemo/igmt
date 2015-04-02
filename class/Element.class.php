@@ -7,7 +7,7 @@
 /**
  * Class that represents an Element of the game. 
  */
-class Element{
+class Element  implements JsonSerializable {
 	
 	////////////////
 	// ATTRIBUTS //
@@ -570,5 +570,28 @@ class Element{
 		}
 		return $string;
 	}
+        
+    /**
+     * Serialize cette class en un array acceptable par json_encode
+     * @return array 
+     */
+    public function jsonSerialize() {       
+        return [
+            'name' => $this->name,
+            'category_name' => $this->category->getName(),
+            'description' => $this->description,
+            
+            'need' => $this->need,
+            'allow' => $this->allow,
+            
+            'extendedBy' => $this->extendedBy,
+            'extends' => $this->extend,
+            'evolve' => $this->evolve,
+            'regress' => $this->regress,
+            
+            /*'cost' => [{"name":"element","scaling_id":"expo"},{"name":"element","scaling_id":"expo"}],
+            'scaling' => 'none|stacking|level',*/
+        ];
+    }
 }
 ?>

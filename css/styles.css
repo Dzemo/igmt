@@ -305,6 +305,7 @@ textarea:focus {
 }
 .element-td div.infos {
   padding: 5px;
+  margin: 0 -1px;
 }
 .element-td div.infos div.name {
   float: left;
