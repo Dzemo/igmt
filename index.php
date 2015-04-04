@@ -38,21 +38,25 @@
 		<div id="header">
 			<div class="main-title"><h1><span>Incrementals Game Modeling Tool</span></h1></div>
 			<ul class="menu">
-				<li>
-					<a href="index.php?page=elements_list" class="<?php echo ($page == 'elements_list' ? 'current' : ''); ?>">
-						Elements list
-					</a>
-				</li>
-				<li>
-					<a href="index.php?page=elements_tree" class="<?php echo ($page == 'elements_tree' ? 'current' : ''); ?>">
-						Elements tree
-					</a>
-				</li>
-				<li>
-					<a href="index.php?page=category_manager" class="<?php echo ($page == 'category_manager' ? 'current' : ''); ?>">
-						Category manager
-					</a>
-				</li>
+                            <li>
+                                <a href="index.php?page=elements_list" class="<?php echo ($page == 'elements_list' ? 'current' : ''); ?>">
+                                    Elements list
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index.php?page=elements_tree" class="<?php echo ($page == 'elements_tree' ? 'current' : ''); ?>">
+                                    Elements tree
+                                </a>
+                            </li>
+                            <li>
+                                <a href="index.php?page=category_manager" class="<?php echo ($page == 'category_manager' ? 'current' : ''); ?>">
+                                    Category manager
+                                </a>
+                            </li>
+                                <button id="button-download-modele" class="button">
+                                    Télécharger le json
+                                </button>
+                            <li>
 			</ul>
 		</div>
 		<div id="content">
@@ -80,6 +84,38 @@
 	</div>
 	</body>
 	<script type="text/javascript">
+                $(function(){
+                        $('#button-download-modele').jaxButton({
+                                url:"processing/ajax_generate_json.php",
+                                before: function(dataset){
+                                        return true;
+                                },
+                                done: function(dataset, sUrl, textStatus, jqXHR){
+
+                                           //Creating new link node.
+                                           var link = document.createElement('a');
+                                           link.href = sUrl;
+
+                                           if (link.download !== undefined){
+                                               //Set HTML5 download attribute. This will prevent file from opening if supported.
+                                               var fileName = sUrl.substring(sUrl.lastIndexOf('/') + 1, sUrl.length);
+                                               link.download = fileName;
+                                           }
+
+                                           //Dispatching click event.
+                                           if (document.createEvent) {
+                                               var e = document.createEvent('MouseEvents');
+                                               e.initEvent('click' ,true ,true);
+                                               link.dispatchEvent(e);
+                                               return true;
+                                           }
+                                    }
+                            });
+                });
+                
+               
+ 
+
 		//see http://ned.im/noty/#options
 		$.noty.defaults = {
 		    layout: 'bottomRight',

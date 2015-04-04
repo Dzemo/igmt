@@ -10,15 +10,16 @@
         $modele['element'] = ElementDao::getAll();
         
         //Récupération des categories
-        //$modele['category'] = CategoryDao::getAll();
+        $modele['category'] = CategoryDao::getAll();
         
         //Génération du Json
         $json = json_encode($modele, JSON_PRETTY_PRINT);
         
          //Création du fichier JSON et écriture dans le fichier
-        $fileName = $modelePath."modele".date("_d_m_y__H_i_s").".json";
-        file_put_contents($fileName, $json);
+        $fileName = "modele".date("_d_m_y__H_i_s").".json";
+        file_put_contents($modelePath.DIRECTORY_SEPARATOR.$fileName, $json);
         
-        //En réponse on envoie le nom du fichier
-        echo $fileName;
+        //En réponse on envoie le chemin du fichier a partir de l'index
+        
+        echo $modelePathFromIndex."/".$fileName;
 ?>

@@ -42,7 +42,7 @@ class CategoryDao extends Dao{
 	 * @return Cateogry       
 	 */
 	public static function getById($id){
-		$arrayResult = self::getByQuery("SELECT * FROM igmt_category WHERE name = ?", [$id]);
+		$arrayResult = self::getByQuery("SELECT * FROM igmt_category WHERE id = ?", [$id]);
 		if(array_key_exists($id, $arrayResult)){
 			return $arrayResult[$id];
 		}

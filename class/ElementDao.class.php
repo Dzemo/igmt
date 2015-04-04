@@ -67,7 +67,11 @@ class ElementDao extends Dao{
 
 		if($result){
 			$element->setId(parent::getConnexion()->lastInsertId());
+                        
 			LinkDao::insertFromElement($element);
+			CostDao::insertFromElement($element);
+                        
+                        $element->setCosts(CostDao::insertFromElement($element));
 			return $element;
 		}
 		else
@@ -91,6 +95,11 @@ class ElementDao extends Dao{
 
 		if($result){
 			LinkDao::updateFromElement($element);
+                        CostDao::updateFromElement($element);
+                        
+                        CostDao::deleteFromElementId($elementId);
+                        $element->setCosts(CostDao::insertFromElement($element));
+                        
 			return $element;
 		}
 		else
@@ -103,7 +112,8 @@ class ElementDao extends Dao{
 	 */
 	public static function delete($elementId){
 		LinkDao::deleteFromElementId($elementId);
-
+                Costdao::deleteFromElementId($elementId);
+                
 		$stmt = parent::getConnexion()->prepare("DELETE FROM igmt_element WHERE id = ?");
 		$stmt->execute(array($elementId));
 	}
@@ -117,7 +127,7 @@ class ElementDao extends Dao{
 	 * @return array        
 	 */
 	private static function getAllElements(){
-			//If the result doesn't contain all Element there will be error when building links
+			//If the result doesn't contain all Element there will be error when building links and costs
 			$stmt = parent::getConnexion()->prepare("SELECT * FROM igmt_element");
 			if($stmt->execute() && $stmt->rowCount() > 0){
 				$arrayResultat = array();
@@ -133,6 +143,11 @@ class ElementDao extends Dao{
 
 					$arrayResultat[$element->getId()] = $element;
 				}
+                                
+                                //Set costs for each element
+                                foreach($arrayResultat as $element){
+                                    $element->setCosts(CostDao::getForElement($element, $arrayResultat));
+                                }
 
 				//Get all links for db
 				if(count($arrayResultat) > 1){

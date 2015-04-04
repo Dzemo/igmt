@@ -83,7 +83,16 @@
 
 						<td class="elements-list-td element-td">
 							<!-- Element -->
-
+                                                        
+                                                        <!-- Cost -->
+                                                        <?php
+                                                            if($element->hasCost()){
+                                                                ?>
+                                                                    
+                                                                <?php
+                                                            }
+                                                        ?>
+                                                        
 							<!-- Infos : Name, description, tags -->
 							<div class="infos">
 								<div class="name">

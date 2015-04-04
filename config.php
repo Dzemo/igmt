@@ -17,7 +17,8 @@
 	$tree_image_absolute_path = dirname(__FILE__).DIRECTORY_SEPARATOR."images".DIRECTORY_SEPARATOR."generation".DIRECTORY_SEPARATOR."elements_tree.png";
 	$tree_generation_log_path = dirname(__FILE__).DIRECTORY_SEPARATOR."log".DIRECTORY_SEPARATOR."tree_generation.log";
 
-        $modelePath = dirname(__FILE__).DIRECTORY_SEPARATOR."modele".DIRECTORY_SEPARATOR;
+        $modelePath = dirname(__FILE__).DIRECTORY_SEPARATOR."modele";
+        $modelePathFromIndex = "modele";
 
 	error_reporting(E_ALL);
 	ini_set('display_errors','1'); 
