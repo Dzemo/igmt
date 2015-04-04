@@ -1,6 +1,5 @@
 <?php
 	
-	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."lessmake.php");
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."config.php");
 
