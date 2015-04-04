@@ -1,7 +1,7 @@
 <?php
-	$dbhost="";
+	$dbhost="localhost";
 	$dbuser="";
 	$dbpass="";
-	$dbname="";
+	$dbname="igmt";
 	$dbparams = array();
 ?>

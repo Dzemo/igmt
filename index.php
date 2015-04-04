@@ -1,6 +1,4 @@
 <?php
-	
-	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."lessmake.php");
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."config.php");
 
@@ -61,6 +59,8 @@
 		</div>
 		<div id="content">
 			<?php 
+                        
+                        echo $_SERVER['SERVER_NAME'].$_SERVER['PHP_SELF'] ;
 				switch($page){
 					case 'elements_list':
 						require_once("page/elements_list.php");
