@@ -1,17 +1,6 @@
 @import url(http://fonts.googleapis.com/css?family=Droid+Sans+Mono);
 /* Définition des couleurs flatuicolors.com */
 /* Définition des class des couleurs flatuicolors.com pour le color picker*/
-/* Css Général */
-/* Header */
-/*Footer */
-/* Les modaux */
-/* GENERAL */
-/* SPECIFIC */
-/* Menu */
-/* Elements table */
-/* Edit form */
-/* Category table */
-/* Color picker*/
 .turquoise {
   color: #1abc9c;
 }
@@ -72,95 +61,6 @@
 .asbestos {
   color: #7f8c8d;
 }
-html,
-body {
-  background-color: ;
-  color: #2c3e50;
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-#wrapper {
-  min-height: 100%;
-  height: auto !important;
-  height: 100%;
-  margin: 0 auto -3em;
-}
-#push,
-#footer {
-  height: 3em;
-  clear: both;
-}
-#header .main-title {
-  text-align: center;
-  padding: 2.5%;
-}
-#header .main-title h1 {
-  color: #2c3e50;
-  font-size: 40px;
-  font-family: 'Calibri', "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 700;
-  text-shadow: 0px 1px 1px #95a5a6;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-stroke: 1px rgba(0,0,0,0.1);
-}
-#header .main-title h1 span {
-  border-top: 2px solid #2980b9;
-  border-bottom: 2px solid #2980b9;
-}
-#header .menu {
-  margin: 0;
-  padding: 0;
-  list-style-type: none;
-  text-align: center;
-}
-#header .menu li {
-  display: inline-block;
-  margin: 0 5px;
-}
-#header .menu li a {
-  text-decoration: none;
-  padding: 3px 16px;
-  color: white;
-  background-color: #2c3e50;
-}
-#header .menu li .current {
-  padding: 1px 16px;
-  border-top: 2px solid #2980b9;
-  border-bottom: 2px solid #2980b9;
-}
-#header .menu li a:hover {
-  color: white;
-  background-color: #34495e;
-}
-#footer {
-  text-align: center;
-  position: relative;
-  bottom: 0px;
-  line-height: 3em;
-  width: 99%;
-}
-#footer span {
-  display: inline-block;
-  vertical-align: middle;
-  line-height: normal;
-}
-a {
-  text-decoration: none;
-  color: #2980b9;
-}
-a:visited {
-  color: #9b59b6;
-}
-a:hover {
-  text-decoration: underline;
-}
-.modal {
-  display: none;
-  background-color: #ecf0f1;
-  border: 1px solid #2c3e50;
-  padding: 2%;
-}
 table.form-table {
   border-collapse: collapse;
   margin: auto;
@@ -195,7 +95,7 @@ table.form-table td.space-td {
   font-weight: 700;
   text-shadow: 0px 1px 1px #95a5a6;
   -webkit-font-smoothing: antialiased;
-  -webkit-text-stroke: 1px rgba(0,0,0,0.1);
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.1);
 }
 .form-subtitle {
   text-align: center;
@@ -205,7 +105,7 @@ table.form-table td.space-td {
   font-weight: 700;
   text-shadow: 0px 1px 1px #95a5a6;
   -webkit-font-smoothing: antialiased;
-  -webkit-text-stroke: 1px rgba(0,0,0,0.1);
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.1);
 }
 div.form-button {
   text-align: center;
@@ -235,6 +135,7 @@ input:disabled,
 textarea:focus {
   background: none;
 }
+/* GENERAL */
 .button {
   border: 1px solid #cccccc;
   background-color: #e0d8d8;
@@ -250,6 +151,7 @@ textarea:focus {
   border: 1px solid #cccccc;
   background-color: #f1f1f1;
 }
+/* SPECIFIC */
 .button-confirm:hover {
   background-color: #52BE80;
 }
@@ -274,6 +176,7 @@ textarea:focus {
 .button-generate:hover {
   background-color: #F5B041;
 }
+/* Menu */
 #elements-list-menu {
   margin: 2.5%;
   text-align: center;
@@ -281,6 +184,7 @@ textarea:focus {
 #elements-list-menu .menu-item {
   padding: 0.5%;
 }
+/* Elements table */
 #elements-list-table {
   border-collapse: collapse;
   width: 95%;
@@ -339,6 +243,7 @@ textarea:focus {
 .condition {
   font-style: italic;
 }
+/* Edit form */
 .modal-edit-element {
   width: 60%;
 }
@@ -380,6 +285,7 @@ textarea:focus {
   padding: 1%;
   margin: 0 10%;
 }
+/* Menu */
 #categories-list-menu {
   margin: 2.5%;
   text-align: center;
@@ -387,6 +293,7 @@ textarea:focus {
 #categories-list-menu .menu-item {
   padding: 0.5%;
 }
+/* Category table */
 #categories-list-table {
   border-collapse: collapse;
   width: 95%;
@@ -413,6 +320,7 @@ textarea:focus {
 .buttons-td button {
   margin: 5px 0;
 }
+/* Color picker*/
 .colorpicker-red,
 .colorpicker-green,
 .colorpicker-blue {
@@ -442,3 +350,97 @@ textarea:focus {
 .colorpicker-blue .ui-slider-handle {
   border-color: #729fcf;
 }
+/* Css Général */
+html,
+body {
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+#wrapper {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  margin: 0 auto -3em;
+}
+#push,
+#footer {
+  height: 3em;
+  clear: both;
+}
+/* Header */
+#header .main-title {
+  text-align: center;
+  padding: 2.5%;
+}
+#header .main-title h1 {
+  color: #2c3e50;
+  font-size: 40px;
+  font-family: 'Calibri', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  text-shadow: 0px 1px 1px #95a5a6;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-stroke: 1px rgba(0, 0, 0, 0.1);
+}
+#header .main-title h1 span {
+  border-top: 2px solid #2980b9;
+  border-bottom: 2px solid #2980b9;
+}
+#header .menu {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  text-align: center;
+}
+#header .menu li {
+  display: inline-block;
+  margin: 0 5px;
+}
+#header .menu li a {
+  text-decoration: none;
+  padding: 3px 16px;
+  color: white;
+  background-color: #2c3e50;
+}
+#header .menu li .current {
+  padding: 1px 16px;
+  border-top: 2px solid #2980b9;
+  border-bottom: 2px solid #2980b9;
+}
+#header .menu li a:hover {
+  color: white;
+  background-color: #34495e;
+}
+/*Footer */
+#footer {
+  text-align: center;
+  position: relative;
+  bottom: 0px;
+  line-height: 3em;
+  width: 99%;
+}
+#footer span {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+}
+a {
+  text-decoration: none;
+  color: #2980b9;
+}
+a:visited {
+  color: #9b59b6;
+}
+a:hover {
+  text-decoration: underline;
+}
+/* Les modaux */
+.modal {
+  display: none;
+  background-color: #ecf0f1;
+  border: 1px solid #2c3e50;
+  padding: 2%;
+}
+/*# sourceMappingURL=styles.css.map */
