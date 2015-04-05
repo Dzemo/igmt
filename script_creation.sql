@@ -6,7 +6,7 @@ CREATE TABLE igmt_category (
 	description TEXT,
 	CONSTRAINT un_igmt_category UNIQUE (name),
 	CONSTRAINT pk_igmt_category PRIMARY KEY (id)
-);
+) ENGINE = MYISAM;
 
 INSERT INTO igmt_category (id, name, description, color) VALUES (1, 'Ressource', 'Element that can be gather', '#27ae60');
 INSERT INTO igmt_category (id, name, description, color) VALUES (2, 'Building', 'Element that can be build', '#2c3e50');
@@ -24,7 +24,7 @@ CREATE TABLE igmt_element (
 	CONSTRAINT pk_igmt_element PRIMARY KEY (id),
 	CONSTRAINT un_igmt_element UNIQUE (name),
 	CONSTRAINT fk_igmt_category FOREIGN KEY (name) REFERENCES igmt_category(id)
-);
+) ENGINE = MYISAM;
 INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (1, 'Time', 1, 'Time is money', '');
 INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (2, 'Wood', 1, 'Ressource to build stuff', '');
 INSERT INTO igmt_element (id, name, category_id, description, tag) VALUES (3, 'Rock', 1, 'Ressource to build stuff', '');
@@ -47,7 +47,7 @@ CREATE TABLE igmt_link (
 	CONSTRAINT pk_igmt_link PRIMARY KEY (id),
 	CONSTRAINT fk_igmt_link_from FOREIGN KEY (from_id) REFERENCES igmt_element(id),
 	CONSTRAINT fk_igmt_link_to FOREIGN KEY (to_id) REFERENCES igmt_element(id)
-);
+) ENGINE = MYISAM;
 
 INSERT INTO igmt_link (from_id, to_id, type, conditions) VALUES (2, 4, 'REQUIRE','Wood > 0');
 INSERT INTO igmt_link (from_id, to_id, type, conditions) VALUES (2, 5, 'REQUIRE','Wood > X');
@@ -67,7 +67,7 @@ CREATE TABLE igmt_cost_scaling (
 	name varchar(40) NOT NULL,
 	formula varchar(255) NOT NULL,
 	CONSTRAINT pk_igmt_cost_scaling PRIMARY KEY (id)
-);
+) ENGINE = MYISAM;
 
 /*forumla from http://mrhen.com/blog/?cat=10*/
 INSERT INTO igmt_cost_scaling(id, name, formula) VALUES (1, 'None', 'cost( n ) = base');
@@ -87,7 +87,7 @@ CREATE TABLE igmt_cost (
 	CONSTRAINT fk_igmt_scaling FOREIGN KEY (scaling_id) REFERENCES igmt_cost_scaling(id),
 	CONSTRAINT fk_igmt_element_from FOREIGN KEY (element_from_id) REFERENCES igmt_element(id),
 	CONSTRAINT fk_igmt_element_to_pay FOREIGN KEY (element_to_pay_id) REFERENCES igmt_element(id)
-);
+) ENGINE = MYISAM;
 
 INSERT INTO igmt_cost(element_from_id, element_to_pay_id, scaling_id, base_quantity) VALUES (4, 2, 3, 10);
 INSERT INTO igmt_cost(element_from_id, element_to_pay_id, scaling_id, base_quantity) VALUES (5, 2, 3, 20);

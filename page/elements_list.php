@@ -1,5 +1,6 @@
 <?php	
 	$allElements = ElementDao::getAll();
+        $allCostScaling = CostScalingDao::getAll();
 	$categories = CategoryDao::getAll();
 
 	if(isset($_GET['category_id']) && filter_var($_GET['category_id'], FILTER_VALIDATE_INT)){
@@ -68,6 +69,9 @@
 		<tbody>
 			<?php
 				foreach ($allElements as $element_index => $element) {
+                                    //Hack pour ne pas afficher le temps
+                                    if($element->getName() == "Time")
+                                        continue;
 				?>
 					<tr class="element-tr category-<?php echo $element->getCategory()->cssClassName();?>" id="element-<?php echo $element->getId();?>">
 						
@@ -84,14 +88,20 @@
 						<td class="elements-list-td element-td">
 							<!-- Element -->
                                                         
-                                                        <!-- Cost -->
-                                                        <?php
-                                                            if($element->hasCost()){
-                                                                ?>
-                                                                    
+                                                        <!-- Costs -->
+                                                        <?php if($element->hasCost()){ ?>
+                                                            <div class="costs">Cost: 
                                                                 <?php
-                                                            }
-                                                        ?>
+                                                                    $first = true;
+                                                                    foreach($element->getCosts() as $cost){
+                                                                        if(!$first) echo ", ";
+
+                                                                        printBaliseAForElement($cost->getElementToPay());
+                                                                        echo " (".$cost->getBaseQuantity().")";
+                                                                    }
+                                                                    ?>
+                                                            </div>
+                                                        <?php } ?>
                                                         
 							<!-- Infos : Name, description, tags -->
 							<div class="infos">
@@ -140,7 +150,7 @@
 							<button class="button button-edit" type="button" onclick="$('#edit-element-<?php echo $element->getId();?>').bPopup();">Edit</button><br>
 							<button class="button button-delete" type="button" onclick="$('#delete-element-<?php echo $element->getId();?>').bPopup();">Delete</button>
 							<?php 
-								printModalEditElement($element, $categories, $allElements);
+								printModalEditElement($element, $categories, $allElements, $allCostScaling);
 								printModalDeleteElement($element);
 							?>
 						</td>
@@ -152,11 +162,14 @@
 	</table>
 	<?php
 		//Modal for new Element
-		printModalEditElement(null, $categories, $allElements);
+		printModalEditElement(null, $categories, $allElements, $allCostScaling);
 	?>
 </div>
 <div id="all-option-elements" style="display:none">
 	<?php echo getOptionElements($allElements, null, null);?>
+</div>
+<div id="all-option-cost-scaling" style="display:none">
+	<?php echo getOptionCostScalling($allCostScaling, null);?>
 </div>
 <script type="text/javascript" language="javascript" src="js/elements_list.js"></script>
 
@@ -173,15 +186,11 @@
 				$target = $innerLink->getTarget();
 				?>
 					<li id="<?php echo "element-".$element->getId()."allow-".$target->getId();?>"
-						><?php echo "$label: ";?>
-						<a href="#element-<?php echo $target->getId();?>"
-							class="toolip"										
-							>
-							<span <?php echo $target->getCategory()->cssHTML();?>>
-								<?php echo $target->getName();?>
-							</span>									
-						</a>
-						<?php
+						><?php 
+                                                        echo "$label: ";
+                                                        
+                                                        printBaliseAForElement($target);
+						
 							if($innerLink->hasConditions())
 							{
 								?>
@@ -194,6 +203,21 @@
 			}
 		}
 	}
+        
+        /**
+         * Print a link a for an element with his name for content and his catogery css class
+         * @param Element $element
+         */
+        function printBaliseAForElement(Element $element){
+            ?>
+                <a href="#element-<?php echo $element->getId();?>"
+		   class="toolip">
+                        <span <?php echo $element->getCategory()->cssHTML();?>>
+                                <?php echo $element->getName();?>
+                        </span>									
+                </a>
+            <?php
+        }
 
 	/**
 	 * Print a modal to confirm the deletion of an Elemement
@@ -338,8 +362,9 @@
 	 * @param  Element $e          
 	 * @param  array $categories  Array of all categories
 	 * @param  array $allElements    Array of all elements (for the links)
+	 * @param  array $allCostScaling
 	 */
-	function printModalEditElement(Element $e = null, $categories, $allElements){
+	function printModalEditElement(Element $e = null, $categories, $allElements, $allCostScaling){
 		//$e is an element but can be null when this function is used to print the modal for creating a new Element
 		
 		//Id of the form, use for input identifier and tabs
@@ -359,6 +384,13 @@
 					<ul class="">
 						<!-- Info -->
 						<li><a href="#<?php echo $form_id;?>-info">Infos</a></li>
+                                                
+                                                <!-- Costs -->
+						<li>
+                                                        <a href="#<?php echo $form_id;?>-costs">
+                                                            Costs (<span class="link-counter-costs"><?php echo ($e ? count($e->getCosts()) : '0');?></span>)                                                        
+                                                        </a>
+                                                </li>
 
 						<!-- Need -->
 						<li>
@@ -449,6 +481,79 @@
 						</table>
 					</div>
 
+                                        <!-- Cost -->
+                                        <?php $form_id_link = $form_id."-costs"; ?>
+                                        <div id="<?php echo $form_id_link;?>" class="form-content-link">
+                                            <div class="form-subtitle">
+                                                    Costs
+                                            </div>			
+                                            <table class="form-table form-table-link-costs">
+                                                <thead>
+                                                    <th>Element</th>
+                                                    <th>Scaling</th>
+                                                    <th>Base quantity</th>
+                                                    <th></th>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                        if($e != null && $e->getCosts()){
+                                                            foreach ($e->getCosts() as $index => $cost) {
+                                                                ?>
+                                                                    <tr class="link-tr link-tr-costs" data-index="<?php echo $index;?>">
+                                                                        <td class="costs-element">
+                                                                            <input
+                                                                                type="hidden"
+                                                                                class="<?php echo $form_id_link;?>-input-costid"
+                                                                                name="<?php echo $form_id_link;?>-input-linkid-<?php echo $index;?>-costs"
+                                                                                value="<?php echo $cost->getId();?>"
+                                                                                />
+                                                                            <select
+                                                                                id="<?php echo $form_id_link;?>-select-element-<?php echo $index;?>-costs"
+                                                                                name="<?php echo $form_id_link;?>-select-element-<?php echo $index;?>-costs"
+                                                                                class="sumo-select <?php echo $form_id_link;?>-select-element"
+                                                                                >
+                                                                                <?php echo getOptionElements($allElements, $cost->getElementToPay(), $e); ?>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td class="costs-scaling">
+                                                                                <select
+                                                                                    id="<?php echo $form_id_link;?>-select-scaling-<?php echo $index;?>-costs"
+                                                                                    name="<?php echo $form_id_link;?>-select-scaling-<?php echo $index;?>-costs"
+                                                                                    class="sumo-select <?php echo $form_id_link;?>-select-scaling"
+                                                                                >
+                                                                                <?php echo getOptionCostScalling($allCostScaling, $cost->getScaling()); ?>
+                                                                            </select>
+                                                                        </td>
+                                                                        <td class="costs-base-quantity">
+                                                                                <input 	
+                                                                                        type="text"
+                                                                                        class="<?php echo $form_id_link;?>-input-base-quantity"
+                                                                                        name="<?php echo $form_id_link;?>-input-base-quantity-<?php echo $index;?>-costs"
+                                                                                        value="<?php echo $cost->getBaseQuantity();?>"
+                                                                                                />
+                                                                        </td>
+                                                                        <td class="costs-remove">
+                                                                                <button type="button"
+                                                                                                class="button button-remove"
+                                                                                                onclick="removeTrLink('costs','<?php echo $form_id;?>', 'costs', <?php echo $index;?>);"
+                                                                                                >
+                                                                                Remove</button>
+                                                                        </td>
+                                                                    </tr>
+                                                                <?php
+                                                            }
+                                                        }
+                                                        ?>
+                                                                        
+                                                        <tr>
+                                                            <td class="button-td" colspan="3" >
+                                                                <button type="button" class="button button-add" onclick="addTrLink('costs','<?php echo $form_id;?>', 'costs')" >Add cost</button>
+                                                            </td>
+                                                        </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
 					<!-- Need -->
 					<?php printDivLink(
 										$form_id, 
@@ -660,6 +765,32 @@
 			}
 		}
 		if(!$e){
+			//Add empty option if there is no $e specified
+			$options .= "<option selected='selected' value=''></option>";
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Return the option list for all CostScaling
+	 * If a $currentScaling is specified, select this CostScaling
+	 * @param  array  $allCostScalling
+	 * @param  CostScaling $currentScaling     
+	 */
+	function getOptionCostScalling($allCostScalling, CostScaling $currentScaling = null){
+		$options = "";
+		foreach ($allCostScalling as $costScalling) {			
+                        $option = "<option value='".$costScalling->getId()."'";
+
+                        if($currentScaling && $currentScaling->getId() == $costScalling->getId()){
+                                $option .= " selected='selected'";
+                        }
+
+                        $option .= ">".$costScalling->getName()."</option><br>";
+                        $options .= $option;			
+		}
+		if(!$currentScaling){
 			//Add empty option if there is no $e specified
 			$options .= "<option selected='selected' value=''></option>";
 		}
