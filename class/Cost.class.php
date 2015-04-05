@@ -134,14 +134,14 @@ class Cost implements JsonSerializable {
     /**
      * @return int
      */
-    public function getDescription() {
+    public function getBaseQuantity() {
         return $this->baseQuantity;
     }
     
     /**
      * @param int $baseQuantity 
      */
-    public function setDescription($baseQuantity) {
+    public function setBaseQuantity($baseQuantity) {
         $this->baseQuantity = $baseQuantity;
     }
 
@@ -166,7 +166,7 @@ class Cost implements JsonSerializable {
      */
     public function jsonSerialize() {
         return [
-            'element_name' => $this->elementToPay != null ? $this->elementToPay>getName() : "Time",
+            'element_name' => $this->elementToPay != null ? $this->elementToPay->getName() : "Time",
             'base_quantity' => $this->baseQuantity,
             'scaling_name' => $this->scaling != null ? $this->scaling->getName() : null,
         ];

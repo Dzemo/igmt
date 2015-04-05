@@ -45,7 +45,7 @@ class CostDao extends Dao {
      * @return Cost       
      */
     public static function getForElement($element, $allElement) {
-        $arrayResult = self::getByQuery("SELECT * FROM igmt_cost WHERE element_from_id = ?", $allElement, [$element->getId()]);
+        return self::getByQuery("SELECT * FROM igmt_cost WHERE element_from_id = ?", $allElement, [$element->getId()]);
     }
 
     /**
@@ -55,7 +55,7 @@ class CostDao extends Dao {
      * @return Cost           
      */
     public static function insert(Cost $cost) {
-        $stmt = parent::getConnexion()->prepare("INSERT INTO igmt_cost (element_from_id, element_to_pay_id, scaling_id, base_quantity) VALUES (?,?,?)");
+        $stmt = parent::getConnexion()->prepare("INSERT INTO igmt_cost (element_from_id, element_to_pay_id, scaling_id, base_quantity) VALUES (?,?,?,?)");
         $result = $stmt->execute(array(
             $cost->getElementFrom() != null ? $cost->getElementFrom()->getId() : null,
             $cost->getElementToPay() != null ? $cost->getElementToPay()->getId() : null,
@@ -76,7 +76,7 @@ class CostDao extends Dao {
      */
     public static function insertFromElement(Element $element){
         
-        foreach($element->getCosts as $cost){
+        foreach($element->getCosts() as $cost){
             $cost = self::insert($cost);
         }
     }
@@ -109,7 +109,7 @@ class CostDao extends Dao {
             $arrayResultat = array();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
-                $cost = new Cost($row['id'], null, null, null, $row['base_quantity']);
+                $cost = new Cost($row['id'], null, null, CostScalingDao::getById($row['scaling_id']), $row['base_quantity']);
 
                 $arrayResultat[$cost->getId()] = $cost;
                 

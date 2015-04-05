@@ -68,10 +68,9 @@ class ElementDao extends Dao{
 		if($result){
 			$element->setId(parent::getConnexion()->lastInsertId());
                         
-			LinkDao::insertFromElement($element);
-			CostDao::insertFromElement($element);
-                        
+			LinkDao::insertFromElement($element);                        
                         $element->setCosts(CostDao::insertFromElement($element));
+                        
 			return $element;
 		}
 		else
@@ -95,9 +94,8 @@ class ElementDao extends Dao{
 
 		if($result){
 			LinkDao::updateFromElement($element);
-                        CostDao::updateFromElement($element);
                         
-                        CostDao::deleteFromElementId($elementId);
+                        CostDao::deleteFromElementId($element->getId());
                         $element->setCosts(CostDao::insertFromElement($element));
                         
 			return $element;

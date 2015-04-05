@@ -7,10 +7,11 @@
         $modele = array();
         
         //Récupération des élément
-        $modele['element'] = ElementDao::getAll();
-        
+        $modele['element'] = ElementDao::getAll();        
         //Récupération des categories
-        $modele['category'] = CategoryDao::getAll();
+        $modele['category'] = CategoryDao::getAll();   
+        //Récupération des cost scaling
+        $modele['cost_scaling'] = CostScalingDao::getAll();
         
         //Génération du Json
         $json = json_encode($modele, JSON_PRETTY_PRINT);
@@ -20,6 +21,5 @@
         file_put_contents($modelePath.DIRECTORY_SEPARATOR.$fileName, $json);
         
         //En réponse on envoie le chemin du fichier a partir de l'index
-        
         echo $modelePathFromIndex."/".$fileName;
 ?>

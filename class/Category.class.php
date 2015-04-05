@@ -177,7 +177,7 @@ class Category implements JsonSerializable {
      */
     public function cssClass() {
         $cssClass = "." . $this->cssClassName() . "{\n";
-        $cssClass.= "   color:" . $this->color . "\n";
+        $cssClass.= "   color:" . $this->color . " !important\n";
         $cssClass.= "}";
 
         return $cssClass;

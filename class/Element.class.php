@@ -86,7 +86,7 @@ class Element implements JsonSerializable {
     private $regress;
     
     /**
-     * Array of cost for this element
+     * Array of costs for this element
      * @var array 
      */
     private $costs;
@@ -124,7 +124,7 @@ class Element implements JsonSerializable {
         $this->extendedBy = array();
         $this->evolve = array();
         $this->regres = null;
-        $this->cost = array();
+        $this->costs = array();
     }
 
     ////////////////////////
@@ -550,6 +550,20 @@ class Element implements JsonSerializable {
      */
     public function hasNeed() {
         return count($this->need) > 0;
+    }
+    
+    /**
+     * Add an cost to this element
+     * The element use to pay this cost must be a different element
+     * @param Cost $cost
+     * @throws InvalidArgumentException
+     */
+    public function addCost(Cost $cost) {
+        if($cost == null)
+            throw new InvalidArgumentException("Cost null");
+        else if ($cost != null && $cost->getElementToPay() != null && $cost->getElementToPay()->getId() == $this->id)
+            throw new InvalidArgumentException("The element use to pay this cost must be a different element");
+        $this->costs[] = $cost;
     }
     
     /**

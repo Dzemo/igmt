@@ -73,6 +73,50 @@
 	}
 
 	//////////
+	//Costs //
+	//////////
+
+        if(isset($_POST['costs']) && is_array($_POST['costs'])){
+		foreach ($_POST['costs'] as $post_costs) {
+			//link_id
+			$cost_id = null;
+			if(filter_var($post_costs['cost_id'], FILTER_VALIDATE_INT)){
+				$cost_id = intval($post_costs['cost_id']);
+			}
+
+			//Target name
+			$element_to_pay = null;
+			if(isset($post_costs['element_to_pay_id']) && strlen($post_costs['element_to_pay_id']) > 0){
+				$element_to_pay_id = filter_var($post_costs['element_to_pay_id'], FILTER_SANITIZE_STRING);
+				if($element_to_pay_id == $element->getId()){
+					$errors[] = 'Element can\'t be use to pay himself';
+				}
+				else if(array_key_exists($element_to_pay_id, $allElements)){
+					$cost = new Cost($cost_id, $element, $allElements[$element_to_pay_id], null, null);
+				}
+				else{
+					$errors[] = 'Element '.$element_to_pay_id.' doesn\'t exists';
+				}
+			}
+
+			//Scaling
+			if(isset($post_costs['scaling_id']) && strlen($post_costs['scaling_id']) > 0 && $cost){
+				$scalingId = filter_var($post_costs['scaling_id'], FILTER_VALIDATE_INT);
+				$cost->setScaling(CostScalingDao::getById($scalingId));
+			}
+                        
+                        //Base quantity
+			if(isset($post_costs['base_quantity']) && strlen($post_costs['base_quantity']) > 0 && $cost){
+				$baseQuantity = filter_var($post_costs['base_quantity'], FILTER_VALIDATE_INT);
+				$cost->setBaseQuantity($baseQuantity);
+			}
+
+			if($cost)
+				$element->addCost($cost);
+		}
+	}
+        
+	//////////
 	//Need //
 	//////////
 

@@ -9,7 +9,7 @@
 /**
  * Class that represents a Category of an Element. 
  */
-class CostScaling {
+class CostScaling implements JsonSerializable {
 
     ////////////////
     // ATTRIBUTS //
@@ -128,6 +128,17 @@ class CostScaling {
                 "&emsp;Formula: " . $this->formula . "<br>";
         
         return $string;
+    }
+    
+    /**
+     * Serialize cette class en un array acceptable par json_encode
+     * @return array 
+     */
+    public function jsonSerialize() {
+        return [
+            'name' => $this->name,
+            'formula' => $this->formula
+        ];
     }
 }
 

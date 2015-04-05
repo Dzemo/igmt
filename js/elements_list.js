@@ -45,6 +45,7 @@ $(function(){
 							name: $('#'+form_id+'-input-name').val(),
 							description: $('#'+form_id+'-textarea-description').val(),
 							category: $('#'+form_id+'-select-category').val(),
+                                                        costs: getDataCosts(form_id),
 							need: getDataForLinkTypeAndCardinal(form_id, 'need', 'many'),
 							allow: getDataForLinkTypeAndCardinal(form_id, 'allow', 'many'),
 							extend: getDataForLinkTypeAndCardinal(form_id, 'extend', 'one'),
@@ -154,13 +155,32 @@ function getDataForLinkTypeAndCardinal(form_id, link_type, cardinal){
 }
 
 /**
+ * Retrive post data for costs
+ * @param  {string} form_id   
+ * @return {mixed}  			Return an array for cardinal many or the element/null for cardinal one	         
+ */
+function getDataCosts(form_id){
+	costs_array = [];
+	$('#'+form_id+'-costs .link-tr-costs').each(function(){
+		costs_array.push({
+			cost_id: $('.'+form_id+'-costs-input-costid',this).val(),
+			element_to_pay_id: $('.'+form_id+'-costs-select-element',this).val(),
+			scaling_id: $('.'+form_id+'-costs-select-scaling',this).val(),
+			base_quantity: $('.'+form_id+'-costs-input-base-quantity',this).val()
+		});
+	});
+
+	return costs_array;
+}
+
+/**
  * Add a tr with select for element and texterea for conditons to add a link
  * @param  {string} link_type                  need|allow|extend|evolve
  * @param  {string} form_id               
  * @param  {string} cardinal                   many|one
  */
 function addTrLink(link_type, form_id, cardinal){
-
+                    //costs, form_id, costs
 	var index = 0;
 	$('#'+form_id+'-'+link_type+' table tbody tr').each(function(){
 		if($(this).data('index') > index)
@@ -168,43 +188,84 @@ function addTrLink(link_type, form_id, cardinal){
 	});
 	index++;
 
-	templateTd = '<tr class="link-tr link-tr-tmp link-tr-{{cardinal}}" data-index="{{index}}">';
-	templateTd+= '	<td class="{{link_type}}-element">';
-	templateTd+= '		<input 	type="hidden"';
-	templateTd+= '			class="{{form_id}}-{{link_type}}-input-linkid"';
-	templateTd+= '			name="{{form_id}}-{{link_type}}-input-linkid-{{index}}-{{cardinal}}"';
-	templateTd+= '			value=""';
-	templateTd+= '			>';
-	templateTd+= '		<select';
-	templateTd+= '			id="{{form_id}}-{{link_type}}-select-element-{{index}}-{{cardinal}}"';
-	templateTd+= '			name="{{form_id}}-{{link_type}}-select-element-{{index}}-{{cardinal}}"';
-	templateTd+= '			class="sumo-select {{form_id}}-{{link_type}}-select-element"';
-	templateTd+= '			>{{options_elements_list}}';
-	templateTd+= '		</select>';
-	templateTd+= '	</td>';
-	templateTd+= '	<td class="{{link_type}}-condition">';
-	templateTd+= '		<textarea';
-	templateTd+= '				row="30" col="2"';
-	templateTd+= '				class="{{form_id}}-{{link_type}}-textarea-condition"';
-	templateTd+= '				name="{{form_id}}-{{link_type}}-textarea-condition-{{index}}-{{cardinal}}"';
-	templateTd+= '				></textarea>';
-	templateTd+= '	</td>';
-	templateTd+= '	<td class="{{link_type}}-remove">';
-	templateTd+= '		<button type="button"';
-	templateTd+= '		        class="button button-remove"';
-	templateTd+= '				onclick="removeTrLink(\'{{link_type}}\',\'{{form_id}}\',\'{{cardinal}}\', {{index}});"';
-	templateTd+= '				>';
-	templateTd+= '		Remove</button>';
-	templateTd+= '	</td>';
-	templateTd+= '</tr>';
-
+        if(link_type == 'costs'){
+            templateTd = '<tr class="link-tr link-tr-tmp link-tr-{{cardinal}}" data-index="{{index}}">';
+            templateTd+= '	<td class="{{link_type}}-element">';
+            templateTd+= '		<input 	type="hidden"';
+            templateTd+= '			class="{{form_id}}-{{link_type}}-input-costid"';
+            templateTd+= '			name="{{form_id}}-{{link_type}}-input-linkid-{{index}}-{{cardinal}}"';
+            templateTd+= '			value=""';
+            templateTd+= '			>';
+            templateTd+= '		<select';
+            templateTd+= '			id="{{form_id}}-{{link_type}}-select-element-{{index}}-{{cardinal}}"';
+            templateTd+= '			name="{{form_id}}-{{link_type}}-select-element-{{index}}-{{cardinal}}"';
+            templateTd+= '			class="sumo-select {{form_id}}-{{link_type}}-select-element"';
+            templateTd+= '			>{{options_elements_list}}';
+            templateTd+= '		</select>';
+            templateTd+= '	</td>';
+            templateTd+= '	<td class="{{link_type}}-scaling">';
+            templateTd+= '		<select';
+            templateTd+= '				id="{{form_id}}-{{link_type}}-select-scaling-{{index}}-costs"';
+            templateTd+= '				class="sumo-select {{form_id}}-{{link_type}}-textarea-scaling"';
+            templateTd+= '				name="{{form_id}}-{{link_type}}-select-scaling-{{index}}-costs"';
+            templateTd+= '				>{{options_cost_scaling_list}}</select>';
+            templateTd+= '	</td>';
+            templateTd+= '	<td class="{{link_type}}-bases-quantity">';
+            templateTd+= '		<input';
+            templateTd+= '                              type="text"';
+            templateTd+= '				class="{{form_id}}-{{link_type}}-input-base-quantity"';
+            templateTd+= '				name="{{form_id}}-{{link_type}}-input-base-quantity-{{index}}-{{cardinal}}"';
+            templateTd+= '				/>';
+            templateTd+= '	</td>';
+            templateTd+= '	<td class="{{link_type}}-remove">';
+            templateTd+= '		<button type="button"';
+            templateTd+= '		        class="button button-remove"';
+            templateTd+= '				onclick="removeTrLink(\'{{link_type}}\',\'{{form_id}}\',\'{{cardinal}}\', {{index}});"';
+            templateTd+= '				>';
+            templateTd+= '		Remove</button>';
+            templateTd+= '	</td>';
+            templateTd+= '</tr>';
+        } else {
+            templateTd = '<tr class="link-tr link-tr-tmp link-tr-{{cardinal}}" data-index="{{index}}">';
+            templateTd+= '	<td class="{{link_type}}-element">';
+            templateTd+= '		<input 	type="hidden"';
+            templateTd+= '			class="{{form_id}}-{{link_type}}-input-linkid"';
+            templateTd+= '			name="{{form_id}}-{{link_type}}-input-linkid-{{index}}-{{cardinal}}"';
+            templateTd+= '			value=""';
+            templateTd+= '			>';
+            templateTd+= '		<select';
+            templateTd+= '			id="{{form_id}}-{{link_type}}-select-element-{{index}}-{{cardinal}}"';
+            templateTd+= '			name="{{form_id}}-{{link_type}}-select-element-{{index}}-{{cardinal}}"';
+            templateTd+= '			class="sumo-select {{form_id}}-{{link_type}}-select-element"';
+            templateTd+= '			>{{options_elements_list}}';
+            templateTd+= '		</select>';
+            templateTd+= '	</td>';
+            templateTd+= '	<td class="{{link_type}}-condition">';
+            templateTd+= '		<textarea';
+            templateTd+= '				row="30" col="2"';
+            templateTd+= '				class="{{form_id}}-{{link_type}}-textarea-condition"';
+            templateTd+= '				name="{{form_id}}-{{link_type}}-textarea-condition-{{index}}-{{cardinal}}"';
+            templateTd+= '				></textarea>';
+            templateTd+= '	</td>';
+            templateTd+= '	<td class="{{link_type}}-remove">';
+            templateTd+= '		<button type="button"';
+            templateTd+= '		        class="button button-remove"';
+            templateTd+= '				onclick="removeTrLink(\'{{link_type}}\',\'{{form_id}}\',\'{{cardinal}}\', {{index}});"';
+            templateTd+= '				>';
+            templateTd+= '		Remove</button>';
+            templateTd+= '	</td>';
+            templateTd+= '</tr>';
+        }
+	
 	options_elements_list = $('#all-option-elements').html();
+	options_cost_scaling_list = $('#all-option-cost-scaling').html();
 
 	templateTd = templateTd.replace(new RegExp('\{\{index\}\}', 'g'), index);
 	templateTd = templateTd.replace(new RegExp('\{\{form_id\}\}', 'g'), form_id);
 	templateTd = templateTd.replace(new RegExp('\{\{link_type\}\}', 'g'), link_type);
 	templateTd = templateTd.replace(new RegExp('\{\{cardinal\}\}', 'g'), cardinal);
 	templateTd = templateTd.replace(new RegExp('\{\{options_elements_list\}\}', 'g'), options_elements_list);
+	templateTd = templateTd.replace(new RegExp('\{\{options_cost_scaling_list\}\}', 'g'), options_cost_scaling_list);
 
 	$(templateTd).insertBefore('#'+form_id+'-'+link_type+' .form-table-link-'+cardinal+' tbody tr:last');
 
@@ -225,6 +286,11 @@ function closeModalEditElement(form_id){
 
 	//Updating link count
 	
+        //Cost
+	link_type = 'costs';
+	cardinal = 'costs';
+	updateLinkCounter(form_id, link_type, cardinal)
+        
 	//Need-many
 	link_type = 'need';
 	cardinal = 'many';

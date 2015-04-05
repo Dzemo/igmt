@@ -14,7 +14,9 @@
 		if($output_path == null)
 			$output_path = dirname(__FILE__).DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."css".DIRECTORY_SEPARATOR."category.css";
 		
- 		unlink($output_path);
+                if(file_exists($output_path)){
+                    unlink($output_path);
+                }
 		
 		$css = "";
 		foreach ($allCategories as $category) {
