@@ -5,4 +5,5 @@ log/*
 images/generation/*
 database_info.php
 css/*.map
+lib/classloader.php
 nbproject/*

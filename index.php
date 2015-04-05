@@ -1,8 +1,6 @@
 <?php
-	
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."lib".DIRECTORY_SEPARATOR."classloader.php");
 	require_once(dirname(__FILE__).DIRECTORY_SEPARATOR."config.php");
-
 	$page = isset($_GET['page']) ? $_GET['page'] : 'elements_list';
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -60,7 +58,7 @@
 		</div>
 		<div id="content">
 			<?php 
-				switch($page){
+                     		switch($page){
 					case 'elements_list':
 						require_once("page/elements_list.php");
 						break;
